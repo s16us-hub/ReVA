@@ -463,7 +463,7 @@
           <p><b>Drop any file here: a flow export (CXone or Five9 XML, CXone or Amazon Connect JSON, Genesys Cloud YAML), a screenshot or photo, a PDF, a Word, PowerPoint, Excel or Visio file, a text file, or a ZIP of these.</b></p>
           <button type="button" class="primary" id="pick">Choose files</button>
           <input type="file" id="file" multiple hidden>
-          <p class="small muted">On the Claude phone app, file pickers don't open. Paste the export text in the box below instead.</p>
+          <p class="small muted">If the file picker doesn't open on your device, paste the export text in the box below instead.</p>
           <p class="small" id="drop-ai"></p>
         </div>
         <p class="small muted">A flow is sent to Claude only when you ask Uma about it or upload a screenshot or document.</p>
@@ -4251,7 +4251,7 @@ function renderClaude() {
   const mt = $("mig-target"), cur = has ? platOf(state.current) : "", keep = mt.value;
   mt.replaceChildren(...Object.keys(PLAT).filter(k => k !== cur).map(k => el("option", { value: k, text: PLAT[k] })));
   if (keep && keep !== cur) mt.value = keep;
-  $("ask").disabled = !has || state.busy;
+  $("ask").disabled = !!state.busy;
 }
 async function askClaude() {
   const q = $("claude-q").value.trim();
@@ -4276,7 +4276,7 @@ async function askClaude() {
 }
 function setBusy(b, label) {
   state.busy = b;
-  $("ask").disabled = b || !state.current;
+  $("ask").disabled = !!b;
   $("ask-status").textContent = b ? (label || "Working…") : "";
 }
 $("ask").addEventListener("click", askClaude);
