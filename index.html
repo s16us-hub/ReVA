@@ -1,14 +1,5 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Review, test and compare NICE CXone Studio and Five9 IVR call flows in your browser.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2315173d'/%3E%3Cpath d='M9 8h6v6H9zM17 18h6v6h-6zM12 14v4h8' stroke='%23ffb000' stroke-width='2.5' fill='none'/%3E%3C/svg%3E">
-</head>
-<body>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>FlowLens</title><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <meta name="claude:viewport-fit-sides" content="cover">
-<title>CXone Flow Workbench</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
   /* Layout: a switchboard. A striped patch bar runs under a bold masthead, each call-flow step type has its own jack colour, and the chart sits on a lilac grid beside a detail card that takes the colour of the selected step. Panels stack on phones. */
@@ -232,8 +223,9 @@
     #paths tr.path-row > td:nth-child(3) { grid-column: 2; grid-row: 2; font-size: 12.5px; color: var(--muted); }
     #paths tr.path-row > td:nth-child(3)::before { content: "Steps: "; }
     #paths tr.path-row > td:nth-child(4) { grid-column: 2; grid-row: 3; font-size: 12.5px; color: var(--muted); }
-    #paths tr.path-row > td:nth-child(4)::before { content: "Ends at: "; }
-    #paths tr.path-row > td.walkcell { grid-column: 3; grid-row: 1 / span 3; align-self: start; }
+    #paths tr.path-row > td:nth-child(4)::before { content: "Assigned to: "; }
+    #paths tr.path-row > td:nth-child(5) { grid-column: 2; grid-row: 4; }
+    #paths tr.path-row > td.walkcell { grid-column: 3; grid-row: 1 / span 4; align-self: start; }
     #paths tr.walk-row { display: block; } #paths tr.walk-row > td { display: block; padding: 12px !important; }
     .walk-step .mono { flex-basis: 100%; margin-left: 28px; }
   }
@@ -312,8 +304,26 @@
   .platforms { display: flex; flex-wrap: wrap; gap: 8px; }
   .plat { --tone: var(--c-menu); display: inline-flex; align-items: center; font: 700 12px/1 var(--mono); letter-spacing: 0.04em; padding: 6px 10px; border-radius: 999px; border: 2px solid var(--tone); background: color-mix(in srgb, var(--tone) 14%, var(--card)); color: var(--ink); white-space: nowrap; }
   .plat.five9 { --tone: var(--c-integration); }
+  .plat.connect { --tone: var(--c-queue); }
+  .plat.genesys { --tone: var(--c-callback); }
   .plat.sm { font-size: 10.5px; padding: 3px 8px; }
   .lib-item.five9 { border-left-color: var(--c-integration); }
+  .lib-item.connect { border-left-color: var(--c-queue); }
+  .lib-item.genesys { border-left-color: var(--c-callback); }
+  .presets select { min-height: 38px; padding: 6px 10px; font-size: 13px; }
+  /* Tester assignment and keyboard help */
+  .asg-bar { gap: 10px 18px; padding: 10px 12px; border-radius: 12px; background: var(--raised); }
+  .asg-bar label { font-weight: 600; color: var(--ink-2); gap: 8px; }
+  .asg-bar input[type="text"], .asg-bar select { min-height: 36px; padding: 6px 10px; font-size: 13px; }
+  .asg-bar input[type="text"] { width: 170px; }
+  .asg-field .row { flex-wrap: nowrap; gap: 6px; }
+  .asg-field button { flex: none; }
+  .keys { margin-top: 26px; font-size: 13px; color: var(--ink-2); }
+  .keys summary { cursor: pointer; font-weight: 700; width: max-content; }
+  .keys dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 18px; margin: 12px 0 0; }
+  .keys dt { font: 600 12px/1.5 var(--mono); color: var(--ink); }
+  .keys dd { margin: 0; }
+  g.node:focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; border-radius: 12px; }
   button.mini { min-height: 32px; padding: 4px 12px; font-size: 12.5px; }
   button.danger { border-color: var(--hot); color: var(--hot); }
   button.danger.solid { background: var(--hot); border-color: var(--hot); color: #fff; }
@@ -414,8 +424,8 @@
   <header class="top">
     <div class="masthead">
       <div>
-        <div class="kicker">CXone Studio · Five9 IVR · Flow review</div>
-        <h1>Flow Workbench</h1>
+        <div class="kicker">CXone · Five9 · Amazon Connect · Genesys Cloud</div>
+        <h1>FlowLens</h1>
       </div>
       <span class="sub" id="flow-sub">No flow open. Start with step 1.</span>
     </div>
@@ -436,8 +446,8 @@
     <div class="hero">
       <div class="hero-copy">
         <h2>Plug in a flow and check the wiring.</h2>
-        <p>Load a NICE CXone Studio script or a Five9 IVR script. The workbench maps every step and branch, flags dead ends and unreachable steps, generates test paths, and checks a CXone flow against its Five9 twin.</p>
-        <div class="platforms"><span class="plat cxone">NICE CXone Studio</span><span class="plat five9">Five9 IVR</span></div>
+        <p>Load a call flow from NICE CXone Studio, Five9, Amazon Connect or Genesys Cloud. FlowLens maps every step and branch, flags dead ends, orphan steps and endless retries, generates test paths, and compares two versions or the same flow on two platforms.</p>
+        <div class="platforms"><span class="plat cxone">NICE CXone Studio</span><span class="plat five9">Five9 IVR</span><span class="plat connect">Amazon Connect</span><span class="plat genesys">Genesys Cloud</span></div>
       </div>
       <div class="card" style="box-shadow: 6px 6px 0 var(--c-start)">
         <label class="field" for="platform">Platform
@@ -445,23 +455,25 @@
             <option value="auto">Detect automatically</option>
             <option value="cxone">NICE CXone Studio</option>
             <option value="five9">Five9 IVR</option>
+            <option value="connect">Amazon Connect</option>
+            <option value="genesys">Genesys Cloud</option>
           </select>
         </label>
         <div class="dropzone" id="drop">
-          <p><b>Drop any file here: a CXone Studio or Five9 IVR export (XML or JSON), a screenshot or photo, a PDF, a Word, PowerPoint, Excel or Visio file, a text file, or a ZIP of these.</b></p>
+          <p><b>Drop any file here: a flow export (CXone or Five9 XML, CXone or Amazon Connect JSON, Genesys Cloud YAML), a screenshot or photo, a PDF, a Word, PowerPoint, Excel or Visio file, a text file, or a ZIP of these.</b></p>
           <button type="button" class="primary" id="pick">Choose files</button>
           <input type="file" id="file" multiple hidden>
-          <p class="small muted">Your files are read in this browser and never uploaded.</p>
+          <p class="small muted">On the Claude phone app, file pickers don't open. Paste the export text in the box below instead.</p>
           <p class="small" id="drop-ai"></p>
         </div>
-        <p class="small muted">Nothing leaves your browser unless you paste it into Claude yourself.</p>
+        <p class="small muted">A flow is sent to Claude only when you ask Uma about it or upload a screenshot or document.</p>
       </div>
     </div>
     <div class="grid2">
       <div class="card">
-        <h3>Or paste XML or JSON</h3>
-        <label class="field" for="paste">CXone Studio or Five9 IVR XML
-          <textarea id="paste" placeholder="&lt;Script ...&gt; or &lt;ivrScript&gt; ..."></textarea>
+        <h3>Or paste an export</h3>
+        <label class="field" for="paste">XML, JSON or YAML text
+          <textarea id="paste" placeholder="&lt;Script ...&gt;, &lt;ivrScript&gt; ..., { &quot;Actions&quot;: [...] } or inboundCall: ..."></textarea>
         </label>
         <div class="row">
           <button type="button" class="primary" id="paste-go">Use pasted text</button>
@@ -470,6 +482,8 @@
         <div class="row">
           <button type="button" id="load-example">Open CXone example</button>
           <button type="button" id="load-example-f9">Open Five9 example</button>
+          <button type="button" id="load-example-ac">Open Connect example</button>
+          <button type="button" id="load-example-gc">Open Genesys example</button>
         </div>
         <div class="row between" id="status-head" hidden>
           <h3>Upload results</h3>
@@ -536,7 +550,7 @@
             <button type="button" id="z-in" aria-label="Zoom in">+</button>
             <button type="button" id="z-fit">Fit</button>
           </div>
-          <div class="hint">Drag to pan · scroll to zoom · select a step</div>
+          <div class="hint">Drag to pan · scroll to zoom · arrow keys follow branches</div>
           <button type="button" class="test-toggle" id="test-toggle" hidden aria-pressed="true">Test results: on</button>
         </div>
         <aside class="card detail" id="detail" aria-live="polite"></aside>
@@ -583,7 +597,6 @@
             <button type="button" id="cycle-new">New cycle</button>
           </div>
           <div class="row">
-            <label class="field tester-field" id="tester-wrap" hidden>Your name <input id="tester-name" type="text" placeholder="Shown on your results" style="min-height: 38px"></label>
             <button type="button" id="res-csv">Export results (CSV)</button>
             <button type="button" id="res-report">Sign-off report</button>
           </div>
@@ -608,9 +621,21 @@
             <button type="button" id="save-tests">Test cases (CSV)</button>
           </div>
         </div>
-        <p class="small muted">Test live: open a path with Walk and tick ✓ or ✕ on each step, or press ▶ Run step by step. Results save instantly. Test offline: download the Excel sheet, fill in the Result column, then upload it back.</p>
+        <p class="small muted">Test live: open a path with Walk and tick ✓ or ✕ on each step, or press ▶ Run step by step. Results save instantly. Test offline: download the Excel sheet, fill in the Result column, then upload it back. Assign paths to testers so each person can filter to their own.</p>
+        <div class="row asg-bar">
+          <label class="row">Show
+            <select id="asg-filter" aria-label="Which paths to show"><option value="all">All paths</option><option value="mine">Assigned to me</option><option value="none">Unassigned</option></select>
+          </label>
+          <label class="row">Assign unassigned paths to
+            <input type="text" id="asg-name" placeholder="Tester name" list="asg-names">
+          </label>
+          <datalist id="asg-names"></datalist>
+          <button type="button" class="mini" id="asg-apply">Assign</button>
+          <button type="button" class="mini" id="asg-me">Assign to me</button>
+        </div>
+        <p class="gap" id="paths-note" hidden></p>
         <div class="wrap"><table>
-          <thead><tr><th>#</th><th>Path</th><th>Steps</th><th>Result</th><th></th></tr></thead>
+          <thead><tr><th>#</th><th>Path</th><th>Steps</th><th>Assigned to</th><th>Result</th><th></th></tr></thead>
           <tbody id="paths"></tbody>
         </table></div>
       </div>
@@ -622,12 +647,12 @@
     <div class="grid2">
       <div class="card" style="box-shadow: 6px 6px 0 var(--c-integration)">
         <h2>Compare two versions</h2>
-        <p class="small muted">Pick both files at once: the before and after versions of one script, or a CXone flow and its Five9 version. The older file becomes A.</p>
+        <p class="small muted">Pick both files at once: the before and after versions of one flow, or the same flow built on two platforms. The older file becomes A.</p>
         <div class="dropzone" id="cmp-drop">
           <p><b>Drop two files here, or one ZIP holding both versions.</b></p>
           <button type="button" class="primary" id="cmp-pick">Choose two files</button>
           <input type="file" id="cmp-file" multiple hidden>
-          <p class="small muted">Any file type works: XML, JSON, screenshots, PDFs, documents. Hold Ctrl (Windows) or Command (Mac) to select two files.</p>
+          <p class="small muted">Any file type works: XML, JSON, YAML, screenshots, PDFs, documents. Hold Ctrl (Windows) or Command (Mac) to select two files.</p>
         </div>
         <ul class="list" id="cmp-status" aria-live="polite"></ul>
       </div>
@@ -636,7 +661,7 @@
         <label class="field">Version A<select id="cmp-a"></select></label>
         <label class="field">Version B<select id="cmp-b"></select></label>
         <div class="row"><button type="button" id="cmp-swap">Swap A and B</button></div>
-        <p class="small muted">Same platform: steps are matched by ID. A CXone flow and a Five9 flow get a parity check that compares what they do.</p>
+        <p class="small muted">Same platform: steps are matched by ID, and changed settings and branches are listed. Flows on two different platforms get a parity check that compares what they do.</p>
       </div>
     </div>
     <div id="cmp-out" class="view" style="padding-top:0"></div>
@@ -646,16 +671,17 @@
   <section id="v-claude" class="view" hidden>
     <div class="card" style="box-shadow: 6px 6px 0 var(--c-event)">
       <h2>Wispr2Uma!</h2>
-      <p class="small muted" id="claude-note">Uma prepares your question with this flow's steps, branches and findings and opens Claude, where you answer it under your own Claude login.</p>
+      <p class="small muted" id="claude-note">Uma (powered by Claude) reads this flow's steps, branches and findings with each question, and nothing else.</p>
       <p class="gap" id="ai-off" hidden></p>
       <div id="ai-on">
       <div class="presets" role="group" aria-label="Preset questions">
         <button type="button" data-preset="Explain this flow in plain English for an operations lead. Cover what callers hear and where the call can end.">Explain for ops</button>
-        <button type="button" data-preset="Draft a fix for each high-severity and medium-severity finding. For each one, name the node number, say what to change in Studio, and say what to test afterwards.">Draft fixes</button>
+        <button type="button" data-preset="Draft a fix for each high-severity and medium-severity finding. For each one, name the node number, say what to change in the flow designer, and say what to test afterwards.">Draft fixes</button>
         <button type="button" data-preset="Write QA test cases for every menu option, the timeout and the invalid-input path. Give caller input, expected route and expected end state.">QA menu cases</button>
         <button type="button" data-preset="Review this flow for risk to the caller: dead ends, missing error handling, hours and holiday gaps, and anything that could strand a caller.">Caller risk review</button>
         <button type="button" data-preset="SELECTED">Explain selected step</button>
-        <button type="button" data-preset="MIGRATE">Map to the other platform</button>
+        <button type="button" data-preset="MIGRATE">Map to another platform</button>
+        <select id="mig-target" aria-label="Platform to map to"></select>
       </div>
       <label class="field" for="claude-q">Your question
         <textarea id="claude-q" placeholder="For example: What happens if the CRM lookup times out?"></textarea>
@@ -699,6 +725,18 @@
   </section>
 </div>
 
+<details class="keys app">
+  <summary>Keyboard shortcuts</summary>
+  <dl>
+    <dt>1 to 7</dt><dd>Open a section. On the section tabs, the left and right arrow keys also move between them.</dd>
+    <dt>Tab, Enter</dt><dd>On the flow chart, Tab moves to a step and Enter selects it.</dd>
+    <dt>↓ ↑</dt><dd>From a selected step on the chart, follow a branch down or go back to the step before. In the step list, move between steps.</dd>
+    <dt>← →</dt><dd>On the chart, move between the branches of the same step.</dd>
+    <dt>+ − 0</dt><dd>On the chart, zoom in, zoom out, and fit the whole flow.</dd>
+    <dt>Y N ← → Esc</dt><dd>In the step-by-step test runner: as expected, not as expected, back, skip, close.</dd>
+  </dl>
+</details>
+
 <div id="toast" class="toast" role="status" hidden></div>
 
 <script src="https://cdn.jsdelivr.net/npm/dagre@0.8.5/dist/dagre.min.js"></script>
@@ -733,16 +771,20 @@ function toast(msg) {
 async function getNs(name) {
   try { return window.claude && window.claude.use ? await window.claude.use(name) : null; } catch (e) { return null; }
 }
-function browserDownload(filename, data, type) {
-  const blob = data instanceof Blob ? data : new Blob([data], { type: type || "text/plain;charset=utf-8" });
-  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = filename; document.body.append(a); a.click();
-  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
-  toast("Downloaded " + filename);
+// Outside Claude (for example when this page is hosted on its own site) files are saved with an ordinary browser download.
+function browserSave(filename, data, type) {
+  try {
+    const blob = data instanceof Blob ? data : new Blob([data], { type: type || "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = el("a", { href: url, download: filename, style: "display:none" });
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    toast("Saved " + filename);
+  } catch (e) { toast("This browser blocked the download. Use Copy instead."); }
 }
 async function saveFile(filename, text) {
-  if (STANDALONE) return browserDownload(filename, text);
   const dl = await getNs("downloads");
-  if (!dl) { toast("Saving files isn't available in this view. Use Copy instead."); return; }
+  if (!dl) { if (window.claude) toast("Saving files isn't available in this view. Use Copy instead."); else browserSave(filename, text); return; }
   try { await dl.save({ filename, data: text }); toast("Saved " + filename); }
   catch (e) {
     const c = e && e.code;
@@ -1076,8 +1118,8 @@ const INTAKE = (() => {
       return found;
     }
 
-  const UNSUPPORTED = "This kind of file can't be read. Use a script export (XML or JSON), a screenshot or photo, a PDF, a Word, PowerPoint, Excel, Visio or text document, or a ZIP of these.";
-  return { classify, toPng, pdfToImages, unzip, jsonFlow, embeddedXml, UNSUPPORTED };
+  const UNSUPPORTED = "This kind of file can't be read. Use a flow export (XML, JSON or YAML), a screenshot or photo, a PDF, a Word, PowerPoint, Excel, Visio or text document, or a ZIP of these.";
+  return { classify, toPng, pdfToImages, unzip, jsonFlow, embeddedXml, loadScript, UNSUPPORTED };
 })();
 
   // ---------- Plain-language flow (shared) ----------
@@ -1088,7 +1130,7 @@ const INTAKE = (() => {
     const clean = s => String(s || "").replace(/^"+|"+$/g, "").replace(/%\{([^}]+)\}/g, "$1").replace(/^\{(.*)\}$/, "$1").trim();
     function summary(a) {
       const T = String(a.type || "").toUpperCase().replace(/[\s_-]+/g, "");
-      const seq = clean(prop(a, /^(sequence|prompt|phrase)$/i));
+      const seq = clean(prop(a, /^(sequence|prompt|phrase|tts)$/i));
       switch (T) {
         case "BEGIN": return "The call enters the script here.";
         case "RUNSUB": { const s = prop(a, /^scriptname$/i), r = prop(a, /^returnvariable$/i); return `Runs the sub-script ${s || "named in its settings"}${r ? `. The result is saved in ${r}` : ""}, then carries on.`; }
@@ -1141,6 +1183,39 @@ const INTAKE = (() => {
         case "QUERY": { const u = prop(a, /url/i); return `Queries an external system${u ? ` (${u})` : ""}.`; }
         case "FOREIGNSCRIPT": { const s = prop(a, /scriptname/i); return `Runs the script ${s || "named in its settings"}.`; }
         case "GETDIGITS": return "Collects digits from the caller.";
+        // Amazon Connect
+        case "START": return "The contact enters the flow here.";
+        case "MESSAGEPARTICIPANT": { const x = clean(prop(a, /^(text|ssml|promptid)$/i)); return x ? `Plays the prompt: ${x}` : "Plays a prompt."; }
+        case "GETPARTICIPANTINPUT": { const x = clean(prop(a, /^(text|ssml|promptid)$/i)), s = prop(a, /^inputtimelimitseconds$/i); return `Plays ${x ? `"${x}"` : "a prompt"} and waits for the caller's input${s ? ` (${s} seconds to answer)` : ""}.`; }
+        case "DISCONNECTPARTICIPANT": return "Disconnects. The contact ends.";
+        case "TRANSFERCONTACTTOQUEUE": return "Puts the contact in the working queue to wait for an agent.";
+        case "UPDATECONTACTTARGETQUEUE": { const q = prop(a, /^queueid$/i); return `Sets the working queue${q ? ` to ${q}` : ""}.`; }
+        case "INVOKELAMBDAFUNCTION": { const fn = prop(a, /^lambdafunctionarn$/i); return `Calls a Lambda function${fn ? ` (${fn.split(":").pop()})` : ""}.`; }
+        case "CHECKHOURSOFOPERATION": { const h = prop(a, /^hoursofoperationid$/i); return `Checks the hours of operation${h ? ` (${h})` : ""}.`; }
+        case "COMPARE": { const v = prop(a, /^comparisonvalue$/i); return v ? `Branches on the value of ${v}.` : "Branches on a contact attribute."; }
+        case "UPDATECONTACTATTRIBUTES": return "Sets contact attributes.";
+        case "TRANSFERTOFLOW": { const id = prop(a, /^contactflowid$/i); return `Hands the contact to another flow${id ? ` (${id})` : ""}. This flow stops here.`; }
+        case "INVOKEFLOWMODULE": return "Runs a flow module, then carries on.";
+        case "TRANSFERPARTICIPANTTOTHIRDPARTY": { const n = prop(a, /^thirdpartyphonenumber$/i); return `Transfers the call${n ? ` to ${n}` : " to an outside number"}.`; }
+        case "CREATECALLBACKCONTACT": return "Sets up a callback for the caller.";
+        // Genesys Cloud
+        case "TASK": case "STATE": return "A named block of actions. Other parts of the flow jump here.";
+        case "INITIALGREETING": return seq ? `Plays the greeting: ${seq}` : "Plays the flow's greeting.";
+        case "PLAYAUDIO": { const x = seq || clean(prop(a, /^exp$/i)); return x ? `Plays: ${x}` : "Plays audio."; }
+        case "DECISION": { const e = prop(a, /^exp$/i); return e ? `Checks whether ${e}.` : "Checks a condition."; }
+        case "SWITCH": return "Takes the first case that is true.";
+        case "EVALUATESCHEDULEGROUP": case "EVALUATESCHEDULE": { const n = prop(a, /^name$/i); return `Checks the schedule${n ? ` (${n})` : ""}.`; }
+        case "TRANSFERTOACD": case "MENUTRANSFERTOACD": { const q = prop(a, /^name$/i); return `Transfers the caller to the queue${q ? ` ${q}` : ""}.`; }
+        case "TRANSFERTONUMBER": case "TRANSFERTOUSER": case "TRANSFERTOGROUP": return "Transfers the call.";
+        case "TRANSFERTOVOICEMAIL": return "Sends the caller to voicemail.";
+        case "CALLDATA": case "DATAACTION": case "CALLBRIDGEACTION": return "Calls a data action in an external system.";
+        case "COLLECTINPUT": return "Collects digits from the caller.";
+        case "JUMPTOTASK": case "MENUJUMPTOTASK": case "CALLTASK": return "Goes to another task.";
+        case "JUMPTOMENU": case "MENUJUMPTOMENU": return "Goes to a menu.";
+        case "MENUTASK": return "Runs the actions for this menu choice.";
+        case "DISCONNECT": case "MENUDISCONNECT": return "Disconnects. The call ends.";
+        case "ENDTASK": return "Ends this task and returns to where it was called.";
+        case "SETPARTICIPANTDATA": case "UPDATEDATA": return "Sets data values.";
       }
       return seq ? `Plays ${seq}.` : "";
     }
@@ -1158,7 +1233,13 @@ const INTAKE = (() => {
       if (/^on.?release$|hang.?up/i.test(l)) return "Caller hangs up";
       return l;
     }
-    const HANDOFF = { RUNSCRIPT: "■ The call continues in the other script.", SPAWN: "■ The other script runs on its own. This path ends here.", TRANSFER: "■ The call is transferred.", BLINDTRANSFER: "■ The call is transferred.", PLACECALL: "■ The call is transferred.", SKILLTRANSFER: "■ The caller is transferred to an agent.", VOICEMAIL: "■ The caller leaves a voicemail." };
+    const HANDOFF = { RUNSCRIPT: "■ The call continues in the other script.", SPAWN: "■ The other script runs on its own. This path ends here.", TRANSFER: "■ The call is transferred.", BLINDTRANSFER: "■ The call is transferred.", PLACECALL: "■ The call is transferred.", SKILLTRANSFER: "■ The caller is transferred to an agent.", VOICEMAIL: "■ The caller leaves a voicemail.",
+      TRANSFERCONTACTTOQUEUE: "■ The caller waits in the queue for an agent.", TRANSFERTOACD: "■ The caller waits in the queue for an agent.", MENUTRANSFERTOACD: "■ The caller waits in the queue for an agent.",
+      TRANSFERTOFLOW: "■ The call continues in the other flow.", ENDTASK: "■ The task ends and returns to where it was called.", CREATECALLBACKCONTACT: "■ A callback is set up for the caller." };
+    // Steps that pass the call on (to a queue, another flow or a number) may have nothing after them.
+    const HANDOFF_RE = /^(RUNSCRIPT|SPAWN|TRANSFER|BLINDTRANSFER|PLACECALL|SKILLTRANSFER|VOICEMAIL|TRANSFERCONTACTTOQUEUE|TRANSFERCONTACTTOAGENT|TRANSFERPARTICIPANTTOTHIRDPARTY|TRANSFERTOFLOW|CREATECALLBACKCONTACT|ENDTASK|ENDSTATE|(MENU)?TRANSFERTO[A-Z]+)$/;
+    const normType = t => String(t || "").toUpperCase().replace(/[\s_-]+/g, "");
+    const isHandoff = a => HANDOFF_RE.test(normType(a && a.type));
     const otherwise = type => /MENU|GETDIGITS|ASK|INPUT/i.test(String(type || "")) ? "Anything else (no valid key)" : "Otherwise";
     // Label to draw on a chart line, given the step it leaves and how many exits that step has.
     const edgeText = (e, fromType, exits) => friendly(e.label) || (exits > 1 ? otherwise(fromType) : "");
@@ -1211,8 +1292,9 @@ const INTAKE = (() => {
           flush(); box.append(row);
           if (!ex.length) {
             const T = String(a.type || "").toUpperCase().replace(/[\s_-]+/g, "");
-            const msg = o.isEnd(a) ? "■ The call ends here." : HANDOFF[T] || (inEvent ? "■ This event path finishes here." : "");
-            box.append(mk("div", "ol-end" + (msg ? (inEvent && !o.isEnd(a) && !HANDOFF[T] ? " ok" : "") : " warn"), msg || "■ Stops here: no next step is connected."));
+            const hand = HANDOFF[T] || (HANDOFF_RE.test(T) ? "■ The call is handed off." : "");
+            const msg = o.isEnd(a) ? "■ The call ends here." : hand || (inEvent ? "■ This event path finishes here." : "");
+            box.append(mk("div", "ol-end" + (msg ? (inEvent && !o.isEnd(a) && !hand ? " ok" : "") : " warn"), msg || "■ Stops here: no next step is connected."));
             return;
           }
           const groups = new Map();
@@ -1253,7 +1335,7 @@ const INTAKE = (() => {
         if (on) { for (let p = r.parentElement; p && p !== box; p = p.parentElement) if (p.tagName === "DETAILS") p.open = true; }
       });
     };
-    return { summary, friendly, otherwise, edgeText, outline, mark };
+    return { summary, friendly, otherwise, edgeText, outline, mark, isHandoff, normType };
   })();
 
 // ---------- Categories ----------
@@ -1285,6 +1367,27 @@ function classify(type, caption) {
   return "other";
 }
 
+// Amazon Connect block types and Genesys Cloud action names, mapped to the same categories.
+const CONNECT_TYPES = { messageparticipant: "prompt", messageparticipantiteratively: "prompt", getparticipantinput: "menu", connectparticipantwithlexbot: "menu",
+  disconnectparticipant: "end", endflowexecution: "end", endflowmoduleexecution: "end", transfercontacttoqueue: "queue", transfercontacttoagent: "transfer",
+  transferparticipanttothirdparty: "transfer", transfertoflow: "sub", invokeflowmodule: "sub", invokelambdafunction: "integration", invokeexternalresource: "integration",
+  checkhoursofoperation: "hours", compare: "logic", loop: "logic", distributebypercentage: "logic", checkmetricdata: "logic", checkoutboundcallstatus: "logic",
+  createcallbackcontact: "callback", start: "start" };
+const connectCat = type => CONNECT_TYPES[String(type || "").toLowerCase()] || (/^(update|set|tag|create|wait|store)/i.test(type) ? "data" : "other");
+const GEN_CATS = [
+  ["start", /^start$/i], ["end", /disconnect/i], ["queue", /transfertoacd/i], ["voicemail", /voicemail/i],
+  ["sub", /transfertoflow|jumpto|calltask|callcommonmodule|^task$|^state$|menutask|callbot|calldigitalbot/i],
+  ["transfer", /transferto/i], ["menu", /^menu$|submenu|collectinput|dialbyextension|askfor|digitalmenu|waitforinput/i],
+  ["prompt", /playaudio|holdmusic|greeting|communicate|sendresponse|^play/i], ["logic", /decision|switch|loop/i],
+  ["hours", /schedule|emergency/i], ["integration", /calldata|dataaction|bridge|lex|dialogflow|datatable|lookup|callsecure/i],
+  ["callback", /callback/i], ["data", /^(set|update|add|clear|enable|disable|find|get|create|initialize|tag|detect|encode|decode|flush)/i]
+];
+const genCat = type => { for (const [cat, re] of GEN_CATS) if (re.test(type || "")) return cat; return "other"; };
+const catFor = (plat, type, caption) => {
+  const c = plat === "connect" ? connectCat(type) : plat === "genesys" ? genCat(type) : "other";
+  return c !== "other" ? c : classify(type, caption);
+};
+
 // ---------- Parser (Studio XML) ----------
 const ID_F = ["ActionID", "ActionId", "ID", "Id", "Key", "Index", "Number", "UID", "Guid"];
 const TYPE_F = ["ActionType", "Type", "ActionName", "Kind", "Tool", "Class", "Name"];
@@ -1297,6 +1400,21 @@ const BRANCH_TAG = /(branch|connector|connection|link|transition|exit|outcome|ro
 const PROP_TAG = /(propert(y|ies)|param(eter)?s?|setting|variable|attribute|field)s?$/i;
 const COORD = /^(x|y|left|top|width|height|posx|posy|locationx|locationy|z|zindex)$/i;
 const SECRET = /(password|passwd|secret|token|api[_-]?key|apikey|authorization|bearer|client[_-]?secret|private[_-]?key)/i;
+// Secrets are also hidden when they sit inside a value: a bearer token in code, a password in a URL, a key in a query string.
+const SECRET_VAL = [
+  [/\b(Bearer|Basic)\s+[A-Za-z0-9._~+\/=-]{8,}/g, "$1 [redacted]"],
+  [/\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{4,}/g, "[redacted]"],
+  [/\b(?:AKIA|ASIA)[0-9A-Z]{16}\b/g, "[redacted]"],
+  [/(\b[a-z][a-z0-9+.-]*:\/\/[^\s\/:@"']+:)[^\s\/@"']+@/gi, "$1[redacted]@"],
+  [/((?:password|passwd|pwd|secret|token|api[_-]?key|apikey|client[_-]?secret|access[_-]?key|private[_-]?key)\w*["']?\s*[=:]\s*["']?)(?!\[redacted\]|\d{1,5}(?![\w.-]))(?=[^\s"'&;,<>()]*\d|[^\s"'&;,<>()]{12,})[^\s"'&;,<>(){}%$]{4,}/gi, "$1[redacted]"]
+];
+function scrub(k, v) {
+  v = String(v ?? "");
+  if (SECRET.test(k)) return { v: "[redacted]", n: 1 };
+  let n = 0;
+  for (const [re, to] of SECRET_VAL) v = v.replace(re, (...m) => { n++; return to.replace("$1", () => m[1] || ""); });
+  return { v, n };
+}
 const META = new Set([...ID_F, ...TYPE_F, ...CAP_F].map(s => s.toLowerCase()));
 function fieldOf(node, names) {
   for (const n of names) {
@@ -1354,7 +1472,7 @@ function parseDesktopXml(doc, fileName) {
     vals.forEach((v, i) => {
       v = String(v).trim(); if (!v) return;
       const k = names[i] || `Param ${i + 1}`;
-      if (SECRET.test(k)) { props.push({ k, v: "[redacted]" }); redacted++; } else props.push({ k, v: v.slice(0, 4000) });
+      const sc = scrub(k, v); redacted += sc.n; props.push({ k, v: sc.v.slice(0, 4000) });
     });
     const lib = kidText(n, "LibraryID"); if (lib) props.push({ k: "LibraryID", v: lib });
     const br = [];
@@ -1427,8 +1545,8 @@ function parseStudioXml(text, fileName) {
       const key = k + "\u0000" + v;
       if (seen.has(key)) return;
       seen.add(key);
-      if (SECRET.test(k)) { v = "[redacted]"; redacted++; }
-      props.push({ k, v });
+      const sc = scrub(k, v); redacted += sc.n;
+      props.push({ k, v: sc.v });
     };
     for (const a of node.attributes) if (!META.has(a.localName.toLowerCase()) && !a.localName.startsWith("xmlns")) push(a.localName, a.value);
     const skip = new Set(br.map(b => b.el));
@@ -1490,17 +1608,18 @@ function normalizeJson(j, fileName) {
   const f9tag = a => F9_TAGS[String(a.type).replace(/\s+/g, "").toLowerCase()];
   // Only module names unique to Five9 mark a JSON flow as Five9; play, menu and hangup exist on both platforms.
   const F9_ONLY = /^(incomingcall|skilltransfer|getdigits|ifelse|setvariable|foreignscript|lookupcontactrecord|lookupcrmrecord|agenttransfer|thirdpartytransfer)$/;
-  const f9 = g.platform === "five9" || (g.platform !== "cxone" && g.actions.some(a => F9_ONLY.test(String(a.type).replace(/\s+/g, "").toLowerCase())));
+  const gp = /five9/.test(g.platform) ? "five9" : /connect/.test(g.platform) ? "connect" : /genesys/.test(g.platform) ? "genesys" : /cxone|nice|studio/.test(g.platform) ? "cxone" : "";
+  const f9 = gp === "five9" || (!gp && g.actions.some(a => F9_ONLY.test(String(a.type).replace(/\s+/g, "").toLowerCase())));
   const actions = g.actions.map(a => {
     const props = Object.entries(a.props || {}).map(([k, v]) => {
-      if (SECRET.test(k)) { redacted++; return { k, v: "[redacted]" }; }
-      return { k, v: typeof v === "string" ? v : JSON.stringify(v) };
+      const sc = scrub(k, typeof v === "string" ? v : JSON.stringify(v)); redacted += sc.n;
+      return { k, v: sc.v };
     }).slice(0, 80);
-    const type = f9 ? String(a.type) : String(a.type).toUpperCase();
-    return { id: a.id, type, caption: String(a.caption || ""), cat: (f9 && f9tag(a)) || classify(type, a.caption), props };
+    const type = f9 || gp === "connect" || gp === "genesys" ? String(a.type) : String(a.type).toUpperCase();
+    return { id: a.id, type, caption: String(a.caption || ""), cat: (f9 && f9tag(a)) || catFor(gp, type, a.caption), props };
   });
   const name = g.name || (fileName || "Studio script").replace(/\.[^.]+$/, "");
-  return { name, platform: f9 ? "five9" : (g.platform === "cxone" ? "cxone" : ""), actions, edges: g.edges, dangling: g.dangling, path: g.path, diag: { redacted } };
+  return { name, platform: f9 ? "five9" : gp, actions, edges: g.edges, dangling: g.dangling, path: g.path, diag: { redacted } };
 }
 
 // ---------- Parser (Five9 IVR) ----------
@@ -1574,8 +1693,7 @@ function parseFive9Xml(text, fileName) {
         const key = k + "\u0000" + t;
         if (seen.has(key)) continue;
         seen.add(key);
-        if (SECRET.test(k)) { props.push({ k, v: "[redacted]" }); redacted++; }
-        else props.push({ k, v: t.slice(0, 500) });
+        const sc = scrub(k, t); redacted += sc.n; props.push({ k, v: sc.v.slice(0, 500) });
       }
     };
     walk(m, []);
@@ -1584,6 +1702,185 @@ function parseFive9Xml(text, fileName) {
   const root = doc.documentElement;
   const name = fieldOf(root, ["name", "scriptName", "ivrScriptName", "Name"]) || (fileName || "Five9 IVR script").replace(/\.(five9ivr|xml)$/i, "");
   return { flow: { name, actions, edges, dangling, platform: "five9" }, diag: { redacted } };
+}
+
+// ---------- Parser (Amazon Connect) ----------
+// A flow export is JSON in the Amazon Connect Flow language: { StartAction, Actions: [{ Identifier, Type, Parameters,
+// Transitions: { NextAction, Conditions: [{ NextAction, Condition }], Errors: [{ NextAction, ErrorType }] } }], Metadata }.
+// There is no start block, so one is added that points at StartAction.
+const isPlain = x => !!x && typeof x === "object" && !Array.isArray(x);
+const CONNECT_NAMES = { MessageParticipant: "Play prompt", GetParticipantInput: "Get customer input", ConnectParticipantWithLexBot: "Get customer input (Lex)", DisconnectParticipant: "Disconnect",
+  TransferContactToQueue: "Transfer to queue", UpdateContactTargetQueue: "Set working queue", InvokeLambdaFunction: "Invoke Lambda function", CheckHoursOfOperation: "Check hours of operation",
+  Compare: "Check contact attributes", UpdateContactAttributes: "Set contact attributes", TransferToFlow: "Transfer to flow", InvokeFlowModule: "Invoke module",
+  UpdateContactRecordingBehavior: "Set recording behavior", UpdateFlowLoggingBehavior: "Set logging behavior", UpdateContactTextToSpeechVoice: "Set voice", CreateCallbackContact: "Transfer to callback queue",
+  EndFlowExecution: "End flow", TransferParticipantToThirdParty: "Transfer to phone number", CheckMetricData: "Check queue status", DistributeByPercentage: "Distribute by percentage" };
+const CONNECT_ERR = { NoMatchingError: "Error", InputTimeLimitExceeded: "Timeout", QueueAtCapacity: "Queue full", MaxWaitTimeExpired: "Timeout" };
+function isConnectJson(j) {
+  return isPlain(j) && Array.isArray(j.Actions) && j.Actions.some(a => isPlain(a) && a.Identifier != null && a.Type) && (j.StartAction != null || j.Actions.some(a => isPlain(a) && a.Transitions));
+}
+function parseConnect(j, fileName) {
+  const meta = (isPlain(j.Metadata) && isPlain(j.Metadata.ActionMetadata) && j.Metadata.ActionMetadata) || {};
+  const acts = j.Actions.filter(a => isPlain(a) && a.Identifier != null);
+  const ids = new Set(acts.map(a => String(a.Identifier)));
+  const actions = [], edges = [], dangling = [], seenE = new Set();
+  let redacted = 0;
+  const link = (from, to, label) => {
+    if (to == null || to === "") return;
+    to = String(to);
+    const k = from + ">" + to + ":" + label; if (seenE.has(k)) return; seenE.add(k);
+    (ids.has(to) ? edges : dangling).push({ from, to, label });
+  };
+  if (j.StartAction != null) {
+    let sid = "start"; while (ids.has(sid)) sid += "_";
+    actions.push({ id: sid, type: "Start", caption: "Contact enters the flow", cat: "start", props: [] });
+    link(sid, j.StartAction, "");
+  }
+  for (const a of acts) {
+    const id = String(a.Identifier), type = String(a.Type), cat = connectCat(type);
+    const props = [];
+    const put = (k, v) => { const sc = scrub(k, v); redacted += sc.n; props.push({ k, v: sc.v.slice(0, 2000) }); };
+    const flat = (o, prefix, d) => {
+      for (const [k, v] of Object.entries(o || {})) {
+        const full = prefix ? prefix + "." + k : k;
+        if (v && typeof v === "object") { if (d < 3) flat(v, full, d + 1); else put(full, JSON.stringify(v)); }
+        else if (v !== "" && v != null) put(full, v);
+      }
+    };
+    flat(a.Parameters, "", 0);
+    const m = isPlain(meta[id]) ? meta[id] : {};
+    const friendlyId = !/^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(id);
+    const caption = (typeof m.name === "string" && m.name) || (friendlyId ? id : "") || CONNECT_NAMES[type] || humanize(type);
+    actions.push({ id, type, caption, cat, props: props.slice(0, 80) });
+    const tr = isPlain(a.Transitions) ? a.Transitions : {};
+    // With conditions, NextAction is the fallback; with only error exits, it is the normal way on.
+    const hasConds = Array.isArray(tr.Conditions) && tr.Conditions.length, hasErrs = Array.isArray(tr.Errors) && tr.Errors.some(e => e && e.NextAction != null);
+    link(id, tr.NextAction, !hasConds && hasErrs ? "Success" : "");
+    for (const c of Array.isArray(tr.Conditions) ? tr.Conditions : []) {
+      const cond = isPlain(c.Condition) ? c.Condition : {}, ops = (Array.isArray(cond.Operands) ? cond.Operands : []).join(", ");
+      let label = ops;
+      if (cat === "hours") label = /^true$/i.test(ops) ? "Open" : /^false$/i.test(ops) ? "Closed" : ops;
+      else if (cond.Operator && !/^(Equals|TextEquals)$/i.test(cond.Operator)) label = (humanize(String(cond.Operator)) + " " + ops).trim();
+      link(id, c.NextAction, label || "Condition");
+    }
+    for (const e of Array.isArray(tr.Errors) ? tr.Errors : []) {
+      const et = String(e.ErrorType || "Error");
+      link(id, e.NextAction, et === "NoMatchingCondition" ? (cat === "menu" ? "No match" : "Otherwise") : CONNECT_ERR[et] || humanize(et));
+    }
+  }
+  const name = (isPlain(j.Metadata) && j.Metadata.name) || j.Name || j.name || (fileName || "Amazon Connect flow").replace(/\.[^.]+$/, "");
+  return { flow: { name: String(name), platform: "connect", actions, edges, dangling }, diag: { redacted } };
+}
+
+// ---------- Parser (Genesys Cloud) ----------
+// Architect flows exported as YAML (Archy) are a tree, not a graph: menus hold choices, tasks hold a list of actions,
+// and an action's outputs hold more actions. The reader turns that into steps and branches: each action leads to the
+// next one in its list, each output is a branch, and a branch that runs out of actions carries on after its parent.
+const GEN_ROOTS = /^(inboundCall|inboundEmail|inboundChat|inboundShortMessage|inQueueCall|inQueueEmail|inQueueShortMessage|outboundCall|secureCall|commonModule|workflow|bot|digitalBot|surveyInvite|voicemail|voiceSurvey)$/;
+const GEN_STOP = /^(disconnect|jumpTo\w+|transferTo\w+|endTask|endState|endFlow|menuDisconnect|menuTransferTo\w+|menuJumpTo\w+|exitLoop|nextLoop)$/i;
+const genesysRoot = j => { if (!isPlain(j)) return null; const k = Object.keys(j).find(x => GEN_ROOTS.test(x) && isPlain(j[x])); return k ? [k, j[k]] : null; };
+const looksGenesysYaml = text => new RegExp("^(" + GEN_ROOTS.source.slice(2, -2) + ")\\s*:\\s*$", "m").test(text) && /^\s+(startUpRef|tasks|menus|states|name)\s*:/m.test(text);
+function parseGenesys(j, fileName) {
+  const [, root] = genesysRoot(j);
+  const actions = [], pend = [], refs = new Map(), names = new Map();
+  let n = 0, redacted = 0;
+  const propsOf = (body, skipTop) => {
+    const outP = [];
+    const walk = (o, prefix, d) => {
+      for (const [k, v] of Object.entries(o || {})) {
+        if (k === "actions" || k === "outputs") continue;
+        if (!prefix && (k === "name" || k === "refId" || (skipTop && skipTop.test(k)))) continue;
+        const full = prefix ? prefix + "." + k : k;
+        if (v && typeof v === "object") { if (d < 6) walk(v, full, d + 1); }
+        else if (v !== "" && v != null) { const sc = scrub(full, v); redacted += sc.n; outP.push({ k: full, v: sc.v.slice(0, 2000) }); }
+      }
+    };
+    walk(body, "", 0);
+    return outP.slice(0, 80);
+  };
+  const node = (type, caption, body, skipTop) => {
+    const id = "g" + (++n);
+    actions.push({ id, type, caption: String(caption || ""), cat: genCat(type), props: propsOf(body, skipTop) });
+    if (isPlain(body) && body.refId != null) refs.set(String(body.refId), id);
+    return id;
+  };
+  // A branch target is a step id, a reference to a task or menu, or a function that returns the step that comes next.
+  const link = (from, to, label) => pend.push([from, to, String(label || "")]);
+  const first = o => { const k = Object.keys(o)[0]; return [k, isPlain(o[k]) ? o[k] : {}]; };
+  const branchLabel = (path, holder) => {
+    const last = path[path.length - 1] || "";
+    if (last === "case") { const v = holder.value; return trunc(String(isPlain(v) ? (v.exp ?? v.lit ?? JSON.stringify(v)) : (v ?? "Case")), 40); }
+    if (last === "default") return "Default";
+    if (last === "task") return "";
+    return last;
+  };
+  const seq = (list, cont) => {
+    const items = (Array.isArray(list) ? list : []).filter(isPlain).map(first);
+    const ids = [];
+    items.forEach(([k, body], i) => ids.push(action(k, body, () => (i + 1 < items.length ? ids[i + 1] : cont()))));
+    return items.length ? () => ids[0] : cont;
+  };
+  const action = (k, body, after) => {
+    const id = node(k, body.name || humanize(k), body, /^(choices|task)$/);
+    const branches = [];
+    const find = (o, path, d) => {
+      if (!o || typeof o !== "object" || d > 7) return;
+      for (const [key, v] of Object.entries(o)) {
+        if (key === "actions" && Array.isArray(v)) { branches.push([path, v, o]); continue; }
+        if (v && typeof v === "object") find(v, [...path, key], d + 1);
+      }
+    };
+    find(body, [], 0);
+    const labels = [];
+    for (const [path, list, holder] of branches) { const lab = branchLabel(path, holder); labels.push(lab.toLowerCase()); link(id, seq(list, after), lab); }
+    const target = body.targetTaskRef || body.targetMenuRef || body.targetStateRef;
+    if (typeof target === "string") link(id, { ref: target }, /^callTask$/i.test(k) ? "Runs task" : "");
+    const covered = (/^decision$/i.test(k) && labels.includes("yes") && labels.includes("no")) || (/^switch$/i.test(k) && labels.includes("default"));
+    if (!GEN_STOP.test(k) && !covered) link(id, after, "");
+    return id;
+  };
+  const menu = body => {
+    const id = node("menu", body.name || "Menu", body, /^choices$/);
+    if (body.name) names.set(String(body.name).toLowerCase(), id);
+    for (const c of Array.isArray(body.choices) ? body.choices : []) {
+      if (!isPlain(c)) continue;
+      const [k, b] = first(c);
+      const dt = /^digit_(.+)$/i.exec(String(b.dtmf || ""));
+      const key = dt ? ({ star: "*", pound: "#" }[dt[1].toLowerCase()] || dt[1]) : "";
+      link(id, /submenu/i.test(k) ? menu(b) : action(k, b, () => null), key || b.name || "");
+    }
+    return id;
+  };
+  const start = node("Start", "Contact enters the flow", {});
+  let entry = start;
+  if (root.initialGreeting != null) { const g = node("initialGreeting", "Initial greeting", isPlain(root.initialGreeting) ? root.initialGreeting : { tts: root.initialGreeting }); link(start, g, ""); entry = g; }
+  let blocks = 0;
+  for (const [listKey, itemKey] of [["tasks", "task"], ["states", "state"]]) for (const item of Array.isArray(root[listKey]) ? root[listKey] : []) {
+    const b = isPlain(item) && item[itemKey]; if (!isPlain(b)) continue;
+    const id = node(itemKey, b.name || humanize(itemKey), { refId: b.refId });
+    if (b.name) names.set(String(b.name).toLowerCase(), id);
+    link(id, seq(b.actions, () => null), ""); blocks++;
+  }
+  for (const item of Array.isArray(root.menus) ? root.menus : []) if (isPlain(item) && isPlain(item.menu)) { menu(item.menu); blocks++; }
+  // Flow types that keep their actions straight under a named section (for example a common module's start-up actions).
+  const loose = [];
+  for (const [k, v] of Object.entries(root)) if (isPlain(v) && Array.isArray(v.actions) && k !== "initialGreeting") { const id = node("task", humanize(k), {}); link(id, seq(v.actions, () => null), ""); loose.push(id); }
+  if (typeof root.startUpRef === "string") link(entry, { ref: root.startUpRef }, "");
+  else if (loose.length) link(entry, loose[0], "");
+  const ids = new Set(actions.map(a => a.id)), edges = [], dangling = [], seenE = new Set();
+  for (const [from, to, label] of pend) {
+    let target = typeof to === "function" ? to() : to;
+    if (isPlain(target)) {
+      const m = /\[([^\]]+)\]\s*$/.exec(target.ref);
+      const hit = m && (refs.get(m[1]) || names.get(m[1].toLowerCase()));
+      if (!hit) { dangling.push({ from, to: target.ref, label }); continue; }
+      target = hit;
+    }
+    if (target == null || !ids.has(target)) continue;
+    const k = from + ">" + target + ":" + label; if (seenE.has(k)) continue; seenE.add(k);
+    edges.push({ from, to: target, label });
+  }
+  const name = root.name || (fileName || "Genesys Cloud flow").replace(/\.[^.]+$/, "");
+  return { flow: { name: String(name), platform: "genesys", actions, edges, dangling }, diag: { redacted, blocks } };
 }
 
 // ---------- Analysis ----------
@@ -1596,33 +1893,43 @@ const KEY_PROPS = /skill|sequence|prompt|phrase|url|uri|endpoint|expression|cond
 
 function analyze(f, ref, knownScripts) {
   const byId = new Map(f.actions.map(a => [a.id, a]));
-  const f9 = f.platform === "five9";
+  const plat = f.platform || "cxone";
+  const f9 = plat === "five9", cx = plat === "cxone";
   const out = new Map(), inc = new Map();
   f.actions.forEach(a => { out.set(a.id, []); inc.set(a.id, []); });
   f.edges.forEach((e, i) => { out.get(e.from)?.push(i); inc.get(e.to)?.push(i); });
+  const reachFrom = starts => {
+    const seen = new Set(), stack = [...starts];
+    while (stack.length) { const id = stack.pop(); if (seen.has(id)) continue; seen.add(id); for (const i of out.get(id) || []) stack.push(f.edges[i].to); }
+    return seen;
+  };
   let roots = f.actions.filter(a => a.cat === "start" || a.cat === "event").map(a => a.id);
-  if (!roots.length) roots = f.actions.filter(a => !inc.get(a.id).length).map(a => a.id);
-  if (!roots.length && f.actions.length) roots = [f.actions[0].id];
-  const reach = new Set(), stack = [...roots];
-  while (stack.length) {
-    const id = stack.pop();
-    if (reach.has(id)) continue;
-    reach.add(id);
-    for (const i of out.get(id) || []) stack.push(f.edges[i].to);
+  let guessed = null, strays = 0;
+  if (!roots.length && f.actions.length) {
+    const entries = f.actions.filter(a => !inc.get(a.id).length).map(a => a.id);
+    if (!f.edges.length) roots = entries;
+    else {
+      // No Begin step: the entry step that leads to the most steps is taken as the start, so stray steps still show up as unreachable.
+      const cands = entries.length ? entries : [f.actions[0].id];
+      let best = cands[0], bestN = -1;
+      for (const c of cands) { const n = reachFrom([c]).size; if (n > bestN) { best = c; bestN = n; } }
+      roots = [best]; guessed = best; strays = cands.length - 1;
+    }
   }
+  const reach = reachFrom(roots);
   // Steps reached only from an event handler (OnAnswer, OnRelease ...) may simply finish: the handler is done.
   const eventOnly = new Set();
   {
     const mainRoots = roots.filter(r => byId.get(r)?.cat !== "event");
-    const main = new Set(), st2 = [...(mainRoots.length ? mainRoots : roots)];
-    while (st2.length) { const id = st2.pop(); if (main.has(id)) continue; main.add(id); for (const i of out.get(id) || []) st2.push(f.edges[i].to); }
+    const main = reachFrom(mainRoots.length ? mainRoots : roots);
     for (const id of reach) if (!main.has(id)) eventOnly.add(id);
   }
   const name = id => { const a = byId.get(id); return a ? (a.caption || a.type) : "#" + id; };
   const findings = [];
   const add = (sev, title, text, id) => findings.push({ sev, title, text, id });
 
-  for (const d of f.dangling || []) add("high", "Branch points to a missing action", `${name(d.from)} (#${d.from}) has a ${d.label ? `"${d.label}" ` : ""}branch to #${d.to}, which isn't in this file. It may be in a subscript, or the branch is broken.`, d.from);
+  for (const d of f.dangling || []) add("high", "Branch points to a missing action", `${name(d.from)} (#${d.from}) has a ${d.label ? `"${d.label}" ` : ""}branch to ${/^[\w-]+$/.test(d.to) ? "#" : ""}${d.to}, which isn't in this file. It may be in a subscript or another file, or the branch is broken.`, d.from);
+  if (guessed && strays) add("low", "Start step was guessed", `No Begin or start step was found, so ${name(guessed)} (#${guessed}) is treated as the start because it leads to the most steps. Steps it can't reach are listed as unreachable.`, guessed);
 
   const labeled = f.edges.filter(e => /^default$/i.test(e.label)).length;
   const withOut = f.actions.filter(a => out.get(a.id).length).length;
@@ -1631,22 +1938,80 @@ function analyze(f, ref, knownScripts) {
   for (const a of f.actions) {
     const o = out.get(a.id).map(i => f.edges[i]);
     const labels = o.map(e => e.label || "");
-    if (!o.length && a.cat !== "end" && !eventOnly.has(a.id) && !/^(RUNSCRIPT|SPAWN|TRANSFER|BLINDTRANSFER|PLACECALL|SKILLTRANSFER|VOICEMAIL)$/i.test(String(a.type).replace(/[\s_-]+/g, ""))) add("med", "Dead end", `${name(a.id)} (#${a.id}) has no outgoing branch, so the call stops here without a hang-up or end action.`, a.id);
-    if (!reach.has(a.id)) add("med", "Unreachable action", `${name(a.id)} (#${a.id}) can't be reached from Begin or any event. It may be left over from an earlier version.`, a.id);
-    if (a.cat === "menu" && o.length) {
+    const T = FLOWTEXT.normType(a.type), nm = `${name(a.id)} (#${a.id})`;
+    if (!reach.has(a.id)) {
+      // One finding per stray step: an orphan has no links at all, an unreachable step still points somewhere.
+      if (!o.length && !inc.get(a.id).length) add("med", "Orphan step", `${nm} isn't connected to anything: no step leads to it and it leads nowhere. It does nothing and can be removed.`, a.id);
+      else add("med", "Unreachable action", `${nm} can't be reached from ${guessed ? "the start step" : "Begin or any event"}. It may be left over from an earlier version.${o.length ? "" : " It also has no outgoing branch."}`, a.id);
+    } else if (!o.length && a.cat !== "end" && !eventOnly.has(a.id) && !FLOWTEXT.isHandoff(a)) add("med", "Dead end", `${nm} has no outgoing branch, so the call stops here without a hang-up or end action.`, a.id);
+    if (T === "SNIPPET" && reach.has(a.id)) {
+      // A code block that is wired in but empty or fully commented out.
+      const cp = a.props.find(p => /^(data|code)$/i.test(String(p.k).split(".").pop()));
+      const others = a.props.filter(p => p !== cp && !/limit|libraryid/i.test(p.k)).length;
+      const live = cp ? String(cp.v).split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith("//")) : [];
+      if (cp ? !live.length : !others) add("low", "Step does nothing", `${nm} is a code block that is ${cp && String(cp.v).trim() ? "fully commented out" : "empty"}, so the call passes through it with no effect. Remove it or restore the code.`, a.id);
+    }
+    const isDefault = l => !l || /^default$/i.test(l);
+    if (a.cat === "menu" && o.length && plat !== "genesys") {
       if (f9) {
-        if (!labels.some(l => /no.?match|no.?input|error|time.?out/i.test(l))) add("med", "Menu has no No Match exit", `${name(a.id)} (#${a.id}) has no No Match exit, so a caller who uses up the allowed attempts has nowhere to go.`, a.id);
+        if (!labels.some(l => /no.?match|no.?input|error|time.?out/i.test(l))) add("med", "Menu has no No Match exit", `${nm} has no No Match exit, so a caller who uses up the allowed attempts has nowhere to go.`, a.id);
       } else {
-        if (!labels.some(l => !l || /^default$/i.test(l)) && !labels.some(l => /time.?out|no.?input|noresponse/i.test(l))) add("med", "Menu has no timeout branch", `${name(a.id)} (#${a.id}) doesn't handle a caller who presses nothing.`, a.id);
-        if (!labels.some(l => !l || /^default$/i.test(l)) && !labels.some(l => /invalid|error|nomatch|no.?match/i.test(l))) add("med", "Menu has no invalid-input branch", `${name(a.id)} (#${a.id}) doesn't handle a key that isn't a menu option.`, a.id);
+        const hasTimeout = labels.some(l => /time.?out|no.?input|noresponse/i.test(l)), hasInvalid = labels.some(l => /invalid|error|nomatch|no.?match/i.test(l));
+        if (!labels.some(isDefault) && !hasTimeout) add("med", "Menu has no timeout branch", `${nm} doesn't handle a caller who presses nothing.`, a.id);
+        if (!labels.some(isDefault) && !hasInvalid) add("med", "Menu has no invalid-input branch", `${nm} doesn't handle a key that isn't a menu option.`, a.id);
+        if (cx && labels.some(isDefault) && !hasTimeout && o.length > 1) add("low", "Menu timeout falls through to Default", `${nm} has no Timeout branch, so a caller who presses nothing takes the Default branch, the same route as any other unhandled input. Add a Timeout branch if silence should be treated differently, for example with a reprompt.`, a.id);
+        // A non-key branch that runs straight back to the menu, with no step in between that can break out.
+        for (const e of o) {
+          if (/^(\d+|[*#])$/.test((e.label || "").trim())) continue;
+          let cur = e.to, back = false; const seenR = new Set();
+          for (let hops = 0; hops < 15; hops++) {
+            if (cur === a.id) { back = true; break; }
+            if (seenR.has(cur)) break; seenR.add(cur);
+            const next = [...new Set((out.get(cur) || []).map(i => f.edges[i].to))];
+            if (next.length !== 1) break;
+            cur = next[0];
+          }
+          if (back) { add("med", "Menu retries with no limit", `${nm}: the ${FLOWTEXT.friendly(e.label) || "default"} branch leads straight back to the menu with no retry counter, so a caller who never presses a valid key hears the menu forever. Add a counter (for example a Loop step) that exits after two or three tries.`, a.id); break; }
+        }
       }
     }
-    if (f9 && /^case$/i.test(a.type) && o.length && !labels.some(l => /no.?match|default|else/i.test(l))) add("med", "Case has no No Match branch", `${name(a.id)} (#${a.id}) has no branch for a value that matches none of the cases.`, a.id);
-    if (a.cat === "integration" && o.length && !labels.some(l => /error|fail|time.?out|exception/i.test(l))) add("med", "Integration has no error branch", `${name(a.id)} (#${a.id}) calls an external system but has no branch for a failure or timeout.`, a.id);
-    if (a.cat === "hours" && o.length && !labels.some(l => /closed|holiday|after|off.?hours/i.test(l))) add("med", "Hours check has no closed branch", `${name(a.id)} (#${a.id}) has no branch for closed hours or holidays.`, a.id);
-    if (a.cat === "queue" && o.length && f9 && !labels.some(l => /error|time.?out|exception|callback|voicemail/i.test(l))) add("med", "Skill Transfer has no error or timeout exit", `${name(a.id)} (#${a.id}) has no exit for a transfer error or queue timeout, so those calls follow the normal path.`, a.id);
-    if (a.cat === "queue" && o.length && !f9 && !labels.some(l => /full|overflow|abandon|timeout|error/i.test(l))) add("low", "Queue has no overflow branch", `${name(a.id)} (#${a.id}) has no branch for a full queue or a timeout.`, a.id);
-    if (!f9 && defaultConv && o.length && a.cat !== "end" && !labels.some(l => /^default$/i.test(l)) && !(labels.some(l => /^true$/i.test(l)) && labels.some(l => /^false$/i.test(l)))) add("low", "No Default branch", `${name(a.id)} (#${a.id}) has no Default branch. Studio guidance is to always connect Default.`, a.id);
+    if (f9 && /^case$/i.test(a.type) && o.length && !labels.some(l => /no.?match|default|else/i.test(l))) add("med", "Case has no No Match branch", `${nm} has no branch for a value that matches none of the cases.`, a.id);
+    if (a.cat === "integration" && o.length && !labels.some(l => /error|fail|time.?out|exception/i.test(l))) add("med", "Integration has no error branch", `${nm} calls an external system but has no branch for a failure or timeout.`, a.id);
+    if (a.cat === "hours" && o.length && !labels.some(l => /closed|holiday|after|off.?hours/i.test(l))) add("med", "Hours check has no closed branch", `${nm} has no branch for closed hours or holidays.`, a.id);
+    if (a.cat === "queue" && o.length && f9 && !labels.some(l => /error|time.?out|exception|callback|voicemail/i.test(l))) add("med", "Skill Transfer has no error or timeout exit", `${nm} has no exit for a transfer error or queue timeout, so those calls follow the normal path.`, a.id);
+    if (a.cat === "queue" && o.length && !f9 && !labels.some(l => /full|overflow|abandon|timeout|error|fail/i.test(l))) add("low", "Queue has no overflow branch", `${nm} has no branch for a full queue or a timeout.`, a.id);
+    if (cx && defaultConv && o.length && a.cat !== "end" && !/^(LOOP|FOR)$/i.test(a.type) && !labels.some(l => /^(finished|repeat)$/i.test(l)) && !labels.some(l => /^default$/i.test(l)) && !(labels.some(l => /^true$/i.test(l)) && labels.some(l => /^false$/i.test(l)))) add("low", "No Default branch", `${nm} has no Default branch. Studio guidance is to always connect Default.`, a.id);
+  }
+  if (cx) {
+    // Code text of a SNIPPET step (its Data or Code property).
+    const codeOf = a => { const cp = a.props.find(p => /^(data|code)$/i.test(String(p.k).split(".").pop())); return cp ? String(cp.v) : ""; };
+    // 2a. Environment set to a literal in code while other steps read {env}: every call goes to that one environment.
+    const envSets = f.actions.filter(a => /^SNIPPET$/i.test(a.type)).map(a => {
+      const m = codeOf(a).match(/(?:^|[\s;:])(?:global:)?env\s*=\s*"([^"{}]*)"/im);
+      return m ? { a, val: m[1] } : null;
+    }).filter(Boolean);
+    const envReaders = f.actions.filter(a => a.props.some(p => /\{env\}/i.test(String(p.v))));
+    for (const { a, val } of envSets) {
+      const others = envReaders.filter(r => r.id !== a.id).length;
+      if (others) add("high", "Environment hard-coded", `${name(a.id)} (#${a.id}) sets env to "${val}" every time, but ${others} other step${others === 1 ? "" : "s"} read {env}. Every call goes to "${val}" whatever environment the flow runs in. Read the environment from a setting instead.`, a.id);
+    }
+    for (const a of f.actions) {
+      const T = a.type.toUpperCase(), nm = `${name(a.id)} (#${a.id})`;
+      const o = out.get(a.id).map(i => f.edges[i]);
+      const labels = o.map(e => e.label || "");
+      // 2b. An IF with an empty body: whatever sits inside it never runs.
+      if (T === "SNIPPET") {
+        const m = codeOf(a).match(/^[ \t]*IF[ \t]+([^\r\n{]*?)[ \t]*\r?\n[ \t]*\{[ \t]*\r?\n?[ \t]*\}/im);
+        if (m) add("med", "Empty IF block", `${nm} has an IF on "${m[1]}" with an empty body, so nothing under it runs. The assignments after it run every time. Check whether the condition is a placeholder.`, a.id);
+      }
+      // 2c. A subflow call with only a Default exit: a failed subflow carries on silently.
+      if (a.cat === "sub" && reach.has(a.id) && o.length && !labels.some(l => /error|fail|exception|time.?out/i.test(l))) add("med", "Subflow call has no failure exit", `${nm} calls a subscript but has no branch for a failed or timed-out call, so the flow carries on as if it worked. If the subscript can fail, add an error branch.`, a.id);
+      // 2d. A fixed queue or work-item number in a queue step (these often differ between environments).
+      if (a.cat === "queue" || /QUEUE/i.test(a.type)) {
+        const lit = a.props.find(p => /^\d{6,}$/.test(String(p.v).trim()));
+        if (lit) add("med", "Literal queue or work-item ID", `${nm} passes the fixed number ${String(lit.v).trim()}. Queue and work-item IDs may differ between environments. Read the number from a setting or a lookup.`, a.id);
+      }
+    }
   }
   for (const a of f.actions) {
     if (a.cat !== "sub") continue;
@@ -1687,7 +2052,7 @@ function analyze(f, ref, knownScripts) {
   findings.sort((a, b) => order[a.sev] - order[b.sev]);
   const findingsByNode = new Map();
   for (const x of findings) { if (!x.id) continue; if (!findingsByNode.has(x.id)) findingsByNode.set(x.id, []); findingsByNode.get(x.id).push(x); }
-  return { byId, out, inc, roots, reach, findings, findingsByNode, name };
+  return { byId, out, inc, roots, reach, findings, findingsByNode, name, guessed };
 }
 
 // ---------- Layout ----------
@@ -1820,8 +2185,10 @@ function simpleLayout(f, an) {
 
 // ---------- Paths for tests ----------
 function genPaths(f, an, max = 40) {
+  const CAP = 150;
   const paths = [], covered = new Set();
   let visits = 0;
+  const endOf = id => { const a = an.byId.get(id); return !a ? "dead end" : a.cat === "end" ? "end" : FLOWTEXT.isHandoff(a) ? "handoff" : "dead end"; };
   const record = (nodes, edgeIdx, end) => {
     if (!edgeIdx.some(i => !covered.has(i))) return;
     edgeIdx.forEach(i => covered.add(i));
@@ -1830,17 +2197,40 @@ function genPaths(f, an, max = 40) {
   const dfs = (node, nodes, edgeIdx) => {
     if (paths.length >= max || visits++ > 20000) return;
     const outs = an.out.get(node) || [];
-    if (!outs.length) { record(nodes, edgeIdx, "dead end"); return; }
+    if (!outs.length) { record(nodes, edgeIdx, endOf(node)); return; }
     for (const i of outs) {
       const to = f.edges[i].to;
       const ne = [...edgeIdx, i];
-      if (nodes.includes(to) || nodes.length >= 25) { record([...nodes, to], ne, "loop"); continue; }
-      if ((an.out.get(to) || []).length === 0) { record([...nodes, to], ne, f.actions.find(a => a.id === to)?.cat === "end" ? "end" : "dead end"); continue; }
+      if (nodes.includes(to) || nodes.length >= 25) { record([...nodes, to], ne, nodes.includes(to) ? "loop" : "long path, cut here"); continue; }
+      if ((an.out.get(to) || []).length === 0) { record([...nodes, to], ne, endOf(to)); continue; }
       dfs(to, [...nodes, to], ne);
     }
   };
   for (const r of an.roots) if (paths.length < max) dfs(r, [r], []);
-  return { paths, covered: covered.size, total: f.edges.length };
+  // Top-up: one more path for each branch the first pass missed, built from the shortest route to that branch.
+  const par = new Map(), q = [];
+  for (const r of an.roots) if (!par.has(r)) { par.set(r, null); q.push(r); }
+  for (let h = 0; h < q.length; h++) for (const i of an.out.get(q[h]) || []) { const to = f.edges[i].to; if (!par.has(to)) { par.set(to, i); q.push(to); } }
+  for (let i = 0; i < f.edges.length && paths.length < CAP; i++) {
+    if (covered.has(i) || !par.has(f.edges[i].from)) continue;
+    const ns = [f.edges[i].from], es = [];
+    for (let cur = ns[0], g = 0; par.get(cur) != null && g < 5000; g++) { const e = par.get(cur); es.unshift(e); cur = f.edges[e].from; ns.unshift(cur); }
+    es.push(i);
+    const onPath = new Set(ns);
+    let cur = f.edges[i].to, end = "";
+    for (let g = 0; g < 80; g++) {
+      if (onPath.has(cur)) { ns.push(cur); end = "loop"; break; }
+      ns.push(cur); onPath.add(cur);
+      const outs = an.out.get(cur) || [];
+      if (!outs.length) { end = endOf(cur); break; }
+      const next = outs.find(j => !covered.has(j) && !es.includes(j)) ?? outs.find(j => !onPath.has(f.edges[j].to)) ?? outs[0];
+      es.push(next); cur = f.edges[next].to;
+    }
+    if (!end) { ns.push(cur); end = "long path, cut here"; }
+    record(ns, es, end);
+  }
+  const untestable = f.edges.filter(e => !par.has(e.from)).length;
+  return { paths, covered: covered.size, total: f.edges.length, untestable, capped: covered.size + untestable < f.edges.length };
 }
 const capName = (f, id) => { const a = f.actions.find(x => x.id === id); return a ? (a.caption || a.type) : "#" + id; };
 function pathName(f, p) {
@@ -1963,6 +2353,42 @@ const EXAMPLE_F9_XML = `<?xml version="1.0" encoding="UTF-8"?>
 </ivrScript>`;
 const EXAMPLE_F9 = { id: "example-f9", name: "Main Inbound Line, Five9 (example)", fileName: "example.five9ivr", example: true, savedAt: 0, flow: null };
 EXAMPLE_F9.flow = parseFive9Xml(EXAMPLE_F9_XML, "example.five9ivr").flow;
+const EXAMPLE_AC_JSON = { Version: "2019-10-30", StartAction: "Welcome", Metadata: { name: "Main Inbound Line, Amazon Connect (example)" }, Actions: [
+  { Identifier: "Welcome", Type: "MessageParticipant", Parameters: { Text: "Thanks for calling." }, Transitions: { NextAction: "Check hours", Errors: [{ NextAction: "Check hours", ErrorType: "NoMatchingError" }] } },
+  { Identifier: "Check hours", Type: "CheckHoursOfOperation", Parameters: { HoursOfOperationId: "Support - US Eastern" }, Transitions: { NextAction: "Closed message",
+    Conditions: [{ NextAction: "Main menu", Condition: { Operator: "Equals", Operands: ["True"] } }, { NextAction: "Closed message", Condition: { Operator: "Equals", Operands: ["False"] } }],
+    Errors: [{ NextAction: "Closed message", ErrorType: "NoMatchingError" }] } },
+  { Identifier: "Main menu", Type: "GetParticipantInput", Parameters: { Text: "Press 1 for billing, or 2 for your account.", InputTimeLimitSeconds: "5" }, Transitions: {
+    Conditions: [{ NextAction: "Set billing queue", Condition: { Operator: "Equals", Operands: ["1"] } }, { NextAction: "Look up account", Condition: { Operator: "Equals", Operands: ["2"] } }],
+    Errors: [{ NextAction: "Closed message", ErrorType: "InputTimeLimitExceeded" }, { NextAction: "Main menu", ErrorType: "NoMatchingCondition" }, { NextAction: "Disconnect", ErrorType: "NoMatchingError" }] } },
+  { Identifier: "Look up account", Type: "InvokeLambdaFunction", Parameters: { LambdaFunctionARN: "arn:aws:lambda:us-east-1:111122223333:function:accountLookup", InvocationTimeLimitSeconds: "3", LambdaInvocationAttributes: { apiKey: "example" } }, Transitions: { NextAction: "Set billing queue" } },
+  { Identifier: "Set billing queue", Type: "UpdateContactTargetQueue", Parameters: { QueueId: "Billing Tier 1" }, Transitions: { NextAction: "Send to queue", Errors: [{ NextAction: "Disconnect", ErrorType: "NoMatchingError" }] } },
+  { Identifier: "Send to queue", Type: "TransferContactToQueue", Parameters: {}, Transitions: { Errors: [{ NextAction: "Closed message", ErrorType: "QueueAtCapacity" }, { NextAction: "Disconnect", ErrorType: "NoMatchingError" }] } },
+  { Identifier: "Closed message", Type: "MessageParticipant", Parameters: { Text: "We are closed right now." }, Transitions: { NextAction: "Disconnect" } },
+  { Identifier: "Disconnect", Type: "DisconnectParticipant", Parameters: {}, Transitions: {} },
+  { Identifier: "Old promo (not connected)", Type: "MessageParticipant", Parameters: { Text: "Ask about our spring offer." }, Transitions: { NextAction: "Main menu" } }
+] };
+const EXAMPLE_AC = { id: "example-ac", name: EXAMPLE_AC_JSON.Metadata.name, fileName: "example-connect.json", example: true, savedAt: 0, flow: parseConnect(EXAMPLE_AC_JSON, "example-connect.json").flow };
+const EXAMPLE_GC_YAML = { inboundCall: { name: "Main Inbound Line, Genesys Cloud (example)", defaultLanguage: "en-us", startUpRef: "/inboundCall/tasks/task[checkHours]", initialGreeting: { tts: "Thanks for calling." },
+  tasks: [
+    { task: { name: "Check hours", refId: "checkHours", actions: [
+      { evaluateScheduleGroup: { name: "Open hours?", scheduleGroup: { lit: { name: "Support - US Eastern" } }, outputs: {
+        active: { actions: [{ jumpToMenu: { name: "Go to the main menu", targetMenuRef: "/inboundCall/menus/menu[mainMenu]" } }] },
+        closed: { actions: [{ playAudio: { name: "Closed message", audio: { tts: "We are closed right now." } } }] } } } },
+      { disconnect: { name: "Hang up" } } ] } },
+    { task: { name: "Look up account", refId: "lookupAccount", actions: [
+      { callData: { name: "Look up account", category: { "Web Services Data Actions": { dataAction: { "Get account by phone": { inputs: { phone: { exp: "Call.Ani" } } } } } }, outputs: {
+        success: { actions: [{ transferToAcd: { name: "Billing queue", targetQueue: { lit: { name: "Billing Tier 1" } } } }] } } } },
+      { playAudio: { name: "Sorry message", audio: { tts: "Sorry, something went wrong." } } } ] } },
+    { task: { name: "Old promo (not connected)", refId: "oldPromo", actions: [
+      { playAudio: { name: "Promo message", audio: { tts: "Ask about our spring offer." } } },
+      { jumpToMenu: { name: "Back to the main menu", targetMenuRef: "/inboundCall/menus/menu[mainMenu]" } } ] } } ],
+  menus: [
+    { menu: { name: "Main menu", refId: "mainMenu", audio: { tts: "Press 1 for billing, 2 for your account, or 9 to hang up." }, choices: [
+      { menuTransferToAcd: { name: "Billing", dtmf: "digit_1", targetQueue: { lit: { name: "Billing Tier 1" } } } },
+      { menuJumpToTask: { name: "My account", dtmf: "digit_2", targetTaskRef: "/inboundCall/tasks/task[lookupAccount]" } },
+      { menuDisconnect: { name: "Hang up", dtmf: "digit_9" } } ] } } ] } };
+const EXAMPLE_GC = { id: "example-gc", name: EXAMPLE_GC_YAML.inboundCall.name, fileName: "example-genesys.yaml", example: true, savedAt: 0, flow: parseGenesys(EXAMPLE_GC_YAML, "example-genesys.yaml").flow };
 
 // ---------- State ----------
 const state = {
@@ -1975,7 +2401,7 @@ const state = {
   detail: "ops",
   sev: "all",
   invFilter: "",
-  sim: { node: null, log: [] },
+  asgFilter: "all",
   ref: { skills: [], hours: [], scripts: [] },
   claudeFocus: null,
   busy: false,
@@ -1992,48 +2418,18 @@ function persistLib() {
   try { localStorage.setItem(LIB_KEY, JSON.stringify(state.lib.filter(e => !e.cloud).slice(0, 20))); }
   catch (e) { toast("Browser storage is full. This flow stays open but won't be saved."); }
 }
-// ---------- Standalone (web) mode ----------
-// On the hosted page there is no Claude runtime. Uma's buttons copy a complete prompt (question + flow data) and open
-// claude.ai in a new tab, so each person uses their own Claude login. Files download through the browser.
-const STANDALONE = !(window.claude && window.claude.use);
-const CLAUDE_NEW = "https://claude.ai/new";
-async function copyPlain(text) {
-  try { await navigator.clipboard.writeText(text); return true; } catch (e) {}
-  try { const t = document.createElement("textarea"); t.value = text; t.style.position = "fixed"; t.style.opacity = "0"; document.body.append(t); t.select(); const ok = document.execCommand("copy"); t.remove(); return ok; } catch (e) { return false; }
-}
-async function sendToClaude(prompt, what) {
-  const ok = await copyPlain(prompt);
-  window.open(CLAUDE_NEW, "_blank", "noopener");
-  showHandoff(ok, prompt, what);
-}
-function showHandoff(copied, prompt, what) {
-  const back = el("div", { class: "runner-back", role: "dialog", "aria-modal": "true", "aria-label": "Continue in Claude" });
-  const close = () => back.remove();
-  const ta = el("textarea", { class: "rn-note", readonly: true, style: "min-height: 120px" }); ta.value = prompt;
-  back.append(el("div", { class: "runner" },
-    el("div", { class: "row between" }, el("b", { text: "Continue in Claude" }), el("button", { type: "button", "aria-label": "Close", text: "×", onclick: close })),
-    el("p", { text: copied ? `The ${what} prompt is copied and Claude opened in a new tab. Paste it there (Ctrl+V, or Cmd+V on a Mac) and send.` : `Copy the ${what} prompt below, then paste it into Claude in the new tab.` }),
-    el("p", { class: "small muted", text: "Claude answers under your own Claude login. No Claude account? Everything else on this page works without it." }),
-    ta,
-    el("div", { class: "row" },
-      el("button", { type: "button", class: "primary", text: "Copy again", onclick: async () => { toast((await copyPlain(prompt)) ? "Copied" : "Select the text and copy it."); } }),
-      el("a", { class: "btn", href: CLAUDE_NEW, target: "_blank", rel: "noopener", text: "Open Claude" }),
-      el("button", { type: "button", text: "Done", onclick: close }))));
-  back.addEventListener("click", e => { if (e.target === back) close(); });
-  document.body.append(back);
-}
 // ---------- Uma (Claude) availability ----------
 // Viewers without Claude (signed out, no access, or declined) get everything else; Uma's buttons turn into a note.
 const AI = { on: null };
 const AI_OFF_CODES = new Set(["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"]);
 function aiOffNote() { return "Uma needs Claude access, which isn't available for you on this page. Review, Findings, Test, Compare and Export all work without it."; }
-async function initAi() { AI.on = STANDALONE ? true : !!(await getNs("sample")); applyAi(); }
+async function initAi() { AI.on = !!(await getNs("sample")); applyAi(); }
 function aiFailed(e) { if (e && AI_OFF_CODES.has(e.code)) { AI.on = false; applyAi(); return true; } return false; }
 function applyAi() {
   const off = AI.on === false;
   $("ai-off").hidden = !off; if (off) $("ai-off").textContent = aiOffNote();
   $("ai-on").hidden = off;
-  $("drop-ai").textContent = off ? "Without Claude, upload a script export (XML or JSON). Screenshots, PDFs and documents need Uma." : STANDALONE ? "Screenshots, PDFs and documents: Uma prepares a prompt for Claude; paste Claude's JSON answer into the box below." : "";
+  $("drop-ai").textContent = off ? "Without Claude, upload a script export (XML or JSON). Screenshots, PDFs and documents need Uma." : "";
   if (!$("v-review").hidden && state.current) renderDetail();
 }
 // ---------- Saved library in your account ----------
@@ -2077,10 +2473,12 @@ async function initCloud() {
 }
 function renderLibStatus() {
   const box = $("lib-status"); if (!box) return;
-  box.textContent = CLOUD.err ? CLOUD.err : CLOUD.col ? (CLOUD.loaded ? "Saved to your account, so they're here on any device. Only you can see them." : "Loading your saved flows…") : "Saved in this browser only. Nothing is uploaded.";
+  box.textContent = CLOUD.err ? CLOUD.err : CLOUD.col ? (CLOUD.loaded ? "Saved to your account, so they're here on any device. Only you can see them." : "Loading your saved flows…") : "Saved in this browser only.";
 }
-const allEntries = () => [EXAMPLE, EXAMPLE_F9, ...state.lib];
-const PLAT = { cxone: "NICE CXone Studio", five9: "Five9 IVR" };
+const allEntries = () => [EXAMPLE, EXAMPLE_F9, EXAMPLE_AC, EXAMPLE_GC, ...state.lib];
+const PLAT = { cxone: "NICE CXone Studio", five9: "Five9 IVR", connect: "Amazon Connect", genesys: "Genesys Cloud" };
+const PLAT_SHORT = { cxone: "CXone", five9: "Five9", connect: "Connect", genesys: "Genesys" };
+const STEP_WORD = { cxone: "Step", five9: "Module", connect: "Block", genesys: "Action" };
 const platOf = e => (e && e.flow && e.flow.platform) || "cxone";
 function knownScriptNames(exclude) {
   const s = new Set();
@@ -2098,7 +2496,6 @@ function openEntry(entry) {
   state.current = entry;
   state.sel = null;
   state.claudeFocus = null;
-  state.sim = { node: null, log: [] };
   refreshAnalysis();
   state.firstFit = true;
   go("review");
@@ -2138,9 +2535,9 @@ function renderAdd() {
   const lib = $("lib"); lib.replaceChildren();
   for (const e of allEntries()) {
     const n = e.flow ? e.flow.actions.length : 0;
-    lib.append(el("li", { class: "lib-item" + (e.example ? " example" : "") + (platOf(e) === "five9" ? " five9" : "") },
+    lib.append(el("li", { class: "lib-item" + (e.example ? " example" : "") + " " + platOf(e) },
       el("div", null,
-        el("div", { class: "row", style: "gap: 8px" }, el("b", { text: e.name }), el("span", { class: "plat sm " + platOf(e), text: platOf(e) === "five9" ? "Five9" : "CXone" })),
+        el("div", { class: "row", style: "gap: 8px" }, el("b", { text: e.name }), el("span", { class: "plat sm " + platOf(e), text: PLAT_SHORT[platOf(e)] || "CXone" })),
         el("div", { class: "small muted", text: `${e.example ? "Example" : e.fileName || "Saved flow"} · ${n} steps` + (e.savedAt ? ` · saved ${new Date(e.savedAt).toLocaleDateString()}` : "") })),
       el("div", { class: "row" },
         el("button", { type: "button", text: "Open", onclick: () => openEntry(e) }),
@@ -2180,7 +2577,7 @@ function clearAllFlows() {
   if (wasUploaded) { state.current = null; state.an = null; state.sel = null; }
   $("ingest-status").replaceChildren(); $("status-head").hidden = true;
   renderAll("add");
-  toast("Cleared all uploaded flows. The two examples stay available.");
+  toast("Cleared all uploaded flows. The examples stay available.");
 }
 let statusTarget = "ingest-status";
 function ingestStatus(msg, cls) {
@@ -2198,42 +2595,53 @@ function addFlow(flow, fileName, note, open = true) {
   if (open) openEntry(entry);
   return entry;
 }
+const hiddenNote = n => (n ? ` ${n} secret value(s) were hidden.` : "");
 function ingestText(text, fileName, open = true) {
   const t = text.trim();
   const choice = $("platform").value;
-  const hidden = n => n ? ` ${n} secret value(s) were hidden.` : "";
   if (t.startsWith("<")) {
-    const plat = choice === "auto" ? (isFive9(t, fileName) ? "five9" : "cxone") : choice;
+    // Only CXone and Five9 export XML; any other platform choice falls back to detecting which of the two it is.
+    const xmlChoice = choice === "cxone" || choice === "five9" ? choice : "auto";
+    const plat = xmlChoice === "auto" ? (isFive9(t, fileName) ? "five9" : "cxone") : xmlChoice;
     let r = plat === "five9" ? parseFive9Xml(t, fileName) : parseStudioXml(t, fileName);
-    if (r.error && choice === "auto") {
+    if (r.error && xmlChoice === "auto") {
       const alt = plat === "five9" ? parseStudioXml(t, fileName) : parseFive9Xml(t, fileName);
       if (!alt.error) r = alt;
     }
     if (r.error) return ingestStatus(`${fileName}: ${r.error}`, "high");
     r.flow.platform = r.flow.platform || "cxone";
-    return addFlow(r.flow, fileName, `Read as ${PLAT[r.flow.platform]}.` + hidden(r.diag.redacted), open);
+    return addFlow(r.flow, fileName, `Read as ${PLAT[r.flow.platform]}.` + hiddenNote(r.diag.redacted), open);
   }
   let j;
-  try { j = JSON.parse(t); } catch (e) { return ingestStatus(`${fileName}: couldn't read this as CXone Studio XML, Five9 IVR XML or JSON. Export the script as XML, or upload a screenshot.`, "high"); }
+  try { j = JSON.parse(t); } catch (e) { return ingestStatus(`${fileName}: couldn't read this as a CXone, Five9, Amazon Connect or Genesys Cloud export. Export the flow again, or upload a screenshot.`, "high"); }
+  if (isConnectJson(j)) { const p = parseConnect(j, fileName); return addFlow(p.flow, fileName, "Read as Amazon Connect." + hiddenNote(p.diag.redacted), open); }
+  if (genesysRoot(j)) { const p = parseGenesys(j, fileName); if (p.diag.blocks) return addFlow(p.flow, fileName, "Read as Genesys Cloud." + hiddenNote(p.diag.redacted), open); }
   const emb = INTAKE.embeddedXml(j);
   if (emb) {
     const p = isFive9(emb, "") ? parseFive9Xml(emb, fileName) : parseStudioXml(emb, fileName);
-    if (!p.error && p.flow.actions.length >= 2) { p.flow.platform = p.flow.platform || "cxone"; return addFlow(p.flow, fileName, `Read the script XML inside this JSON as ${PLAT[p.flow.platform]}.` + hidden(p.diag.redacted), open); }
+    if (!p.error && p.flow.actions.length >= 2) { p.flow.platform = p.flow.platform || "cxone"; return addFlow(p.flow, fileName, `Read the script XML inside this JSON as ${PLAT[p.flow.platform]}.` + hiddenNote(p.diag.redacted), open); }
   }
   const f = normalizeJson(j, fileName);
   if (!f || f.error) return ingestStatus(`${fileName}: the JSON was read, but no list of steps was found in it.` + (f && f.keys && f.keys.length ? ` Top-level keys: ${f.keys.join(", ")}.` : "") + " Send Claude a redacted copy in chat so the reader can be adjusted to this format.", "high");
-  f.platform = f.platform || (choice === "five9" ? "five9" : "cxone");
-  return addFlow(f, fileName, `Read as ${PLAT[f.platform]}.` + hidden(f.diag.redacted), open);
+  f.platform = f.platform || (PLAT[choice] ? choice : "cxone");
+  return addFlow(f, fileName, `Read as ${PLAT[f.platform]}.` + hiddenNote(f.diag.redacted), open);
 }
-const platformPhrase = () => ({ five9: "Five9 IVR script", cxone: "NICE CXone Studio script" })[$("platform").value] || "contact-center IVR call flow (NICE CXone Studio or Five9 IVR)";
-const FLOW_SHAPE = `{"name": string, "platform": "cxone" or "five9", "actions": [{"id": string, "type": string, "caption": string, "props": {}, "branches": [{"label": string, "to": string}]}]}`;
+// Genesys Cloud Architect flows exported as YAML. The YAML reader loads from cdnjs only when such a file arrives.
+const JSYAML = "https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js";
+async function ingestYaml(text, fileName, open = true) {
+  try { await INTAKE.loadScript(JSYAML); } catch (e) { return ingestStatus(`${fileName}: the YAML reader couldn't load. Check the connection and try again.`, "high"); }
+  let j;
+  try { j = window.jsyaml.load(text); } catch (e) { return ingestStatus(`${fileName}: this isn't valid YAML${e && e.mark ? ` (line ${e.mark.line + 1})` : ""}. Export the flow from Architect again.`, "high"); }
+  if (!genesysRoot(j)) return ingestStatus(`${fileName}: the YAML was read, but it isn't a Genesys Cloud Architect flow.`, "high");
+  const p = parseGenesys(j, fileName);
+  if (!p.diag.blocks) return ingestStatus(`${fileName}: this Genesys Cloud flow has no tasks, states or menus to map.`, "high");
+  return addFlow(p.flow, fileName, "Read as Genesys Cloud." + hiddenNote(p.diag.redacted), open);
+}
+const platformPhrase = () => ({ five9: "Five9 IVR script", cxone: "NICE CXone Studio script", connect: "Amazon Connect contact flow", genesys: "Genesys Cloud Architect flow" })[$("platform").value] || "contact-center IVR call flow (NICE CXone Studio, Five9 IVR, Amazon Connect or Genesys Cloud)";
+const FLOW_SHAPE = `{"name": string, "platform": "cxone", "five9", "connect" or "genesys", "actions": [{"id": string, "type": string, "caption": string, "props": {}, "branches": [{"label": string, "to": string}]}]}`;
 const jsonBase = name => String(name || "flow").replace(/\.[^.]+$/, "") + ".json";
 // Screenshots, photos and PDF pages, read by Claude as one flow.
 async function ingestImages(files, label, open = true, what = "screenshot") {
-  if (STANDALONE) {
-    ingestStatus(`${label}: attach this ${what} in Claude with the copied prompt, then paste Claude's JSON answer into the box below and press "Use pasted text".`, "ok");
-    return sendToClaude(`Extract the ${platformPhrase()} diagram in the attached image${files.length > 1 ? "s" : ""} into JSON only, with this shape: ${FLOW_SHAPE}. Use the node or module numbers as ids; if there are none, number the steps. Use the platform's own action or module type names. Copy branch labels exactly. Output the JSON and nothing else.`, `${what} (attach the file in Claude)`);
-  }
   ingestStatus(`${label}: reading the ${what} with Claude…`);
   const ns = await getNs("sample");
   if (!ns) return ingestStatus(`${label}: reading a ${what} needs Claude, which isn't available in this view. Use the XML or JSON export instead.`, "high");
@@ -2256,10 +2664,6 @@ async function ingestImages(files, label, open = true, what = "screenshot") {
 }
 // Documents and plain text (Word, PowerPoint, Excel, Visio, text, HTML), read by Claude.
 async function ingestDocText(text, label, open, kind) {
-  if (STANDALONE) {
-    ingestStatus(`${label}: paste Claude's JSON answer into the box below and press "Use pasted text".`, "ok");
-    return sendToClaude(`The text below comes from a ${kind} that may describe a ${platformPhrase()}. Extract the call flow into JSON only, with this shape: ${FLOW_SHAPE}. Use the step numbers as ids; if there are none, number the steps in order. Use the platform's own action or module type names. Add a branch for every route the text describes, labelled with its condition or key. Output the JSON and nothing else.\n\nTEXT:\n${text.slice(0, 60000)}`, kind);
-  }
   ingestStatus(`${label}: asking Claude to find the call flow in this ${kind}…`);
   const ns = await getNs("sample");
   if (!ns) return ingestStatus(`${label}: this is a ${kind}, not a script export. Reading it needs Claude, which isn't available in this view. Use the XML or JSON export, or a screenshot.`, "high");
@@ -2311,7 +2715,9 @@ async function intakeFile(file, open = true, depth = 0) {
       if (open && out.length === 1) openEntry(out[0]);
       return out;
     }
-    case "text": return one(await ingestDocText(c.text, file.name, open, c.html ? "web page" : "text file"));
+    case "text":
+      if (!c.html && looksGenesysYaml(c.text)) return one(await ingestYaml(c.text, file.name, open));
+      return one(await ingestDocText(c.text, file.name, open, c.html ? "web page" : "text file"));
     case "empty": ingestStatus(`${file.name}: the file is empty.`, "high"); return [];
     default: ingestStatus(`${file.name}: ${INTAKE.UNSUPPORTED}`, "high"); return [];
   }
@@ -2330,13 +2736,15 @@ drop.addEventListener("drop", e => { if (e.dataTransfer && e.dataTransfer.files.
 document.addEventListener("paste", e => {
   if (!$("v-add").hidden && e.clipboardData && e.clipboardData.files.length) handleFiles(e.clipboardData.files);
 });
-$("paste-go").addEventListener("click", () => {
-  let t = $("paste").value; if (!t.trim()) return toast("Paste the XML or JSON first.");
-  t = t.trim().replace(/^```(?:json|xml)?\s*/i, "").replace(/```\s*$/, "");
-  $("ingest-status").replaceChildren(); ingestText(t, t.startsWith("<") ? "pasted.xml" : "pasted.json");
+$("paste-go").addEventListener("click", async () => {
+  const t = $("paste").value; if (!t.trim()) return toast("Paste the export text first.");
+  $("ingest-status").replaceChildren();
+  if (looksGenesysYaml(t)) await ingestYaml(t, "pasted flow.yaml"); else ingestText(t, "pasted flow.txt");
 });
 $("load-example").addEventListener("click", () => openEntry(EXAMPLE));
 $("load-example-f9").addEventListener("click", () => openEntry(EXAMPLE_F9));
+$("load-example-ac").addEventListener("click", () => openEntry(EXAMPLE_AC));
+$("load-example-gc").addEventListener("click", () => openEntry(EXAMPLE_GC));
 $("paste-clear").addEventListener("click", () => { $("paste").value = ""; $("paste").focus(); });
 $("status-clear").addEventListener("click", () => { $("ingest-status").replaceChildren(); $("status-head").hidden = true; });
 let refArmed = null;
@@ -2409,24 +2817,24 @@ function buildChart() {
   box.addEventListener("wheel", e => { e.preventDefault(); const r = box.getBoundingClientRect(); zoomAt(e.deltaY < 0 ? 1.12 : 0.89, e.clientX - r.left, e.clientY - r.top); }, { passive: false });
   $("z-in").addEventListener("click", () => zoomAt(1.2, box.clientWidth / 2, box.clientHeight / 2));
   $("z-out").addEventListener("click", () => zoomAt(0.83, box.clientWidth / 2, box.clientHeight / 2));
-  $("z-fit").addEventListener("click", fit);
+  $("z-fit").addEventListener("click", () => fit(true));
 }
 function applyView() { if (CH.vp) CH.vp.setAttribute("transform", `translate(${state.view.x},${state.view.y}) scale(${state.view.k})`); }
 function zoomAt(f, mx, my) {
-  const k0 = state.view.k, k1 = Math.min(3, Math.max(0.2, k0 * f));
+  const k0 = state.view.k, k1 = Math.min(3, Math.max(0.08, k0 * f));
   state.view.x = mx - (mx - state.view.x) * (k1 / k0);
   state.view.y = my - (my - state.view.y) * (k1 / k0);
   state.view.k = k1; applyView();
 }
-function fit() {
+function fit(whole) {
   if (!state.pos || !state.current || !state.pos.size) return;
   const box = $("chartbox");
   const B = chartBounds(state.pos);
   const minX = B.minX, minY = B.minY, bw = B.maxX - minX, bh = B.maxY - minY;
   const w = box.clientWidth, h = box.clientHeight;
   const k = Math.min((w - 48) / bw, (h - 72) / bh, 1);
-  // Keep steps readable: below 0.6 the whole flow no longer fits, so start at the top and let people pan.
-  state.view.k = Math.max(0.85, k);
+  // Opening a flow keeps steps readable and starts at the top; the Fit button shows the whole flow, however large.
+  state.view.k = whole === true ? Math.max(0.08, k) : Math.max(0.85, k);
   const kk = state.view.k;
   state.view.x = bw * kk <= w - 48 ? (w - bw * kk) / 2 - minX * kk : 24 - minX * kk;
   state.view.y = bh * kk <= h - 72 ? (h - bh * kk) / 2 - minY * kk : 24 - minY * kk;
@@ -2438,7 +2846,7 @@ function drawChart() {
   $("test-toggle").hidden = !(state.current && currentCycle() && TR.results.size);
   $("test-toggle").textContent = state.showTests ? "Test results: on" : "Test results: off";
   $("test-toggle").setAttribute("aria-pressed", String(!!state.showTests));
-  drawFlow(CH.gEdges, CH.gNodes, state.current.flow, state.an, state.pos, { sel: state.sel, markerId: "arw", test: tm, onSelect: id => { if (!CH.moved) select(id); } });
+  drawFlow(CH.gEdges, CH.gNodes, state.current.flow, state.an, state.pos, { sel: state.sel, markerId: "arw", test: tm, onSelect: id => { if (!CH.moved) select(id); }, onKeySelect: id => { select(id); focusNode(id); }, onNav: navStep });
   applyView();
 }
 // Shared renderer for the main chart and the side-by-side compare charts.
@@ -2505,7 +2913,7 @@ function drawFlow(gEdges, gNodes, f, an, pos, opts) {
     const p = pos.get(a.id); if (!p) return;
     const isSel = sel === a.id;
     const nm = marks.nodes.get(a.id);
-    const g = svgEl("g", { class: "node", transform: `translate(${p.x},${p.y})`, tabindex: "0", role: "button", "aria-label": `${a.caption || a.type}, step ${a.id}${nm ? ", " + MARK_TXT[nm].toLowerCase() : ""}` });
+    const g = svgEl("g", { class: "node", "data-id": a.id, transform: `translate(${p.x},${p.y})`, tabindex: "0", role: "button", "aria-label": `${a.caption || a.type}, step ${a.id}${nm ? ", " + MARK_TXT[nm].toLowerCase() : ""}` });
     const shape = shapeOf(a, (an.out.get(a.id) || []).length);
     const tone = `var(--c-${a.cat})`;
     const ts = opts.test && opts.test.get(a.id);
@@ -2551,7 +2959,10 @@ function drawFlow(gEdges, gNodes, f, an, pos, opts) {
     }
     if (opts.onSelect) {
       g.addEventListener("click", () => opts.onSelect(a.id));
-      g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); opts.onSelect(a.id); } });
+      g.addEventListener("keydown", e => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); (opts.onKeySelect || opts.onSelect)(a.id); }
+        else if (opts.onNav && /^Arrow(Up|Down|Left|Right)$/.test(e.key)) { e.preventDefault(); opts.onNav(a.id, e.key); }
+      });
     }
     gNodes.append(g);
   });
@@ -2595,6 +3006,35 @@ function select(id) {
   state.sel = id;
   if (!$("v-review").hidden) { if (state.mode === "chart") drawChart(); renderDetail(); FLOWTEXT.mark($("outline"), id); }
   else go("review");
+}
+// Keyboard on the chart: from a step, Down follows a branch, Up goes back, Left and Right move between sibling branches.
+function navStep(id, key) {
+  const f = state.current.flow, an = state.an, pos = state.pos;
+  const byX = ids => [...new Set(ids)].filter(x => pos.get(x)).sort((a, b) => pos.get(a).x - pos.get(b).x || pos.get(a).y - pos.get(b).y);
+  const outs = (an.out.get(id) || []).map(i => f.edges[i].to).filter(x => x !== id);
+  const ins = (an.inc.get(id) || []).map(i => f.edges[i].from).filter(x => x !== id);
+  let to = null;
+  if (key === "ArrowDown") to = byX(outs)[0];
+  else if (key === "ArrowUp") to = byX(ins)[0];
+  else {
+    const sibs = byX(ins.flatMap(par => (an.out.get(par) || []).map(i => f.edges[i].to)));
+    const k = sibs.indexOf(id);
+    if (k >= 0 && sibs.length > 1) to = sibs[(k + (key === "ArrowRight" ? 1 : sibs.length - 1)) % sibs.length];
+  }
+  if (to == null) return;
+  select(to); focusNode(to);
+}
+// Puts keyboard focus on a step after the chart is redrawn, and pans to it if it is off screen.
+function focusNode(id) {
+  const p = state.pos && state.pos.get(id), box = $("chartbox");
+  if (p && box.clientWidth) {
+    const k = state.view.k, sx = p.x * k + state.view.x, sy = p.y * k + state.view.y, w = box.clientWidth, h = box.clientHeight;
+    if (sx < 16 || sy < 16 || sx + NW * k > w - 16 || sy + NH * k > h - 56) {
+      state.view.x = w / 2 - (p.x + NW / 2) * k; state.view.y = h / 2 - (p.y + NH / 2) * k; applyView();
+    }
+  }
+  const g = CH.gNodes && [...CH.gNodes.querySelectorAll("g.node")].find(n => n.getAttribute("data-id") === String(id));
+  if (g) { try { g.focus({ preventScroll: true }); } catch (e) { g.focus(); } }
 }
 function setMode(m) {
   state.mode = m;
@@ -2671,7 +3111,7 @@ function renderDetail() {
   const props = state.detail === "ops" ? a.props.filter(p => KEY_PROPS.test(p.k) || /^(data|expression|scriptname|eventname|to|subject|actiontype|actionvalue)$/i.test(p.k)) : a.props;
   const parts = [
     el("div", { class: "detail-h" },
-      el("span", { class: "kicker-chip" }, el("i", null), `${platOf(state.current) === "five9" ? "Module" : "Step"} #${a.id} · ${CATS[a.cat]}`),
+      el("span", { class: "kicker-chip" }, el("i", null), `${STEP_WORD[platOf(state.current)] || "Step"} #${a.id} · ${CATS[a.cat]}`),
       el("h2", { text: a.caption || a.type }),
       el("span", { class: "mono muted", text: a.type }),
       FLOWTEXT.summary(a) ? el("p", { class: "small", text: FLOWTEXT.summary(a) }) : null),
@@ -2704,32 +3144,11 @@ function renderDetail() {
 }
 
 // ---------- Step explanation (Review panel) ----------
-function stepPrompt(a) {
-  const f = state.current.flow, an = state.an;
-  const outs = (an.out.get(a.id) || []).map(i => f.edges[i]), ins = (an.inc.get(a.id) || []).map(i => f.edges[i]);
-  const desc = id => { const x = an.byId.get(id); return x ? `#${id} ${x.type} "${x.caption || ""}"` : `#${id} (missing)`; };
-  return `I'm reviewing one step of a ${PLAT[platOf(state.current)]} script. Explain it in plain language with these short sections, no tables:
-What it does / What the caller or agent notices / What happens next (one bullet per branch) / Watch out for
-
-STEP: ${desc(a.id)} (${CATS[a.cat]})
-Settings:
-${a.props.slice(0, 40).map(p => `- ${p.k} = ${String(p.v).slice(0, 1500)}`).join("\n") || "- none"}
-Branches out:
-${outs.map(e => `- ${FLOWTEXT.edgeText(e, a.type, outs.length) || "Next"} -> ${desc(e.to)}`).join("\n") || "- none"}
-Reached from:
-${ins.map(e => `- ${desc(e.from)}${e.label ? " on " + e.label : ""}`).join("\n") || "- nothing"}
-Findings:
-${(an.findingsByNode.get(a.id) || []).map(x => `- ${x.sev}: ${x.title}: ${x.text}`).join("\n") || "- none"}
-
-WHOLE FLOW (context):
-${buildContext().slice(0, 9000)}`;
-}
 // One click explains the selected step in place: what it does, what the caller notices, each branch, and what to check.
 const STEP_AI = new Map();
 const stepKey = id => (state.current ? state.current.id : "") + ":" + id;
 let stepAbort = null;
 async function explainStep(a, again) {
-  if (STANDALONE) return sendToClaude(stepPrompt(a), "step explanation");
   const key = stepKey(a.id), f = state.current.flow, an = state.an;
   const box = $("step-ai"), out = $("step-ai-out"), status = $("step-ai-status"), btn = $("step-ask");
   box.hidden = false; out.textContent = ""; status.textContent = "Please hold. Uma is on it…"; btn.disabled = true;
@@ -2804,7 +3223,7 @@ function renderInventory() {
   const f = state.current.flow, an = state.an;
   const q = state.invFilter.trim().toLowerCase();
   const rows = f.actions.filter(a => !q || `${a.type} ${a.caption} ${a.cat}`.toLowerCase().includes(q));
-  $("inv").replaceChildren(...rows.map(a => el("tr", { style: "cursor: pointer", onclick: () => { state.sel = a.id; go("review"); } },
+  $("inv").replaceChildren(...rows.map(a => el("tr", { style: "cursor: pointer", tabindex: "0", onclick: () => { state.sel = a.id; go("review"); }, onkeydown: e => { if (e.key === "Enter") { state.sel = a.id; go("review"); } } },
     el("td", { class: "mono", text: a.id }), el("td", { text: a.type }), el("td", { text: a.caption || "—" }),
     el("td", null, el("span", { class: "kicker-chip" }, el("i", { style: `background: var(--c-${a.cat})` }), CATS[a.cat])),
     el("td", { text: String(an.out.get(a.id).length) }), el("td", { text: String(an.inc.get(a.id).length) }))));
@@ -2817,28 +3236,75 @@ function renderTests() {
   if (!has) return;
   const f = state.current.flow, an = state.an;
   const g = genPaths(f, an);
-  const pct = g.total ? Math.round(100 * g.covered / g.total) : 100;
   ensureCycle(); renderCycleBar(g);
   renderTestStats(g);
+  renderAssignBar();
+  const notes = [];
+  if (g.untestable) notes.push(`${g.untestable} branch${g.untestable === 1 ? " starts" : "es start"} from steps the call can't reach, so no test path covers ${g.untestable === 1 ? "it" : "them"}. See Findings for the unreachable steps.`);
+  if (g.capped) notes.push(`This flow has more routes than the ${g.paths.length} paths listed, so some branches aren't covered by a test path.`);
+  $("paths-note").hidden = !notes.length; $("paths-note").textContent = notes.join(" ");
   const tbody = $("paths"); tbody.replaceChildren();
+  let shown = 0;
   g.paths.forEach((p, i) => {
+    const pr = pathResult(f, an, p);
+    if (state.asgFilter === "mine" && !isMine(pr.r)) return;
+    if (state.asgFilter === "none" && assigneeLabel(pr.r)) return;
+    shown++;
     const endId = p.nodes[p.nodes.length - 1];
     const btn = el("button", { type: "button", class: "walkbtn", "aria-expanded": "false", text: "Walk", onclick: () => toggleWalk(row, btn, i, p) });
-    const pr = pathResult(f, an, p);
-    const res = el("td", null, currentCycle() ? resultPill(pr) : el("span", { class: "small muted", text: "—" }));
+    const res = el("td", { class: "rescell" }, currentCycle() ? resultPill(pr) : el("span", { class: "small muted", text: "—" }));
     if (pr.r && pr.r.testedAt) res.append(el("span", { class: "rmeta" }, (pr.r.testerText ? el("span", { text: pr.r.testerText }) : el("span", { "data-uid": pr.r.tester || "", text: testerName(pr.r.tester) })), ` · ${new Date(pr.r.testedAt).toLocaleDateString()}`));
-    const row = el("tr", { class: "path-row" },
+    const row = el("tr", { class: "path-row", "data-i": String(i) },
       el("td", { class: "mono", text: String(i + 1) }),
       el("td", null, pathName(f, p), el("span", { class: "rmeta", text: `Ends at ${capName(f, endId)} (${p.end})` })),
       el("td", { text: String(p.nodes.length) }),
+      el("td", { class: "asgcell" }, assigneeLabel(pr.r) || el("span", { class: "muted", text: "—" })),
       res,
       el("td", { class: "walkcell" }, btn));
     tbody.append(row);
   });
-  if (!g.paths.length) tbody.append(el("tr", null, el("td", { colspan: "5", text: "No paths. The flow may have no start point. Check the Begin step." })));
-  if (openWalk != null) { const rows = tbody.querySelectorAll("tr.path-row"); const k = openWalk; openWalk = null; if (rows[k]) rows[k].querySelector(".walkbtn").click(); }
-  renderSim();
+  if (!g.paths.length) tbody.append(el("tr", null, el("td", { colspan: "6", text: "No paths. The flow may have no start point. Check the Begin step." })));
+  else if (!shown) tbody.append(el("tr", null, el("td", { colspan: "6", class: "muted", text: state.asgFilter === "mine" ? "No paths are assigned to you in this cycle." : "Every path has a tester." })));
+  if (openWalk != null) { const k = openWalk; openWalk = null; const r = tbody.querySelector(`tr.path-row[data-i="${k}"]`); if (r) r.querySelector(".walkbtn").click(); }
 }
+// Branches on unreachable steps can't be tested, so they are left out of the coverage figure and reported in a note instead.
+const coveragePct = g => { const n = g.total - g.untestable; return n > 0 ? Math.round(100 * g.covered / n) : 100; };
+// ----- Tester assignment -----
+// Each path can carry a tester's name. Assigning a path doesn't count as testing it: the result and its date stay as they were.
+const asgNorm = v => String(v || "").trim().toLowerCase();
+const assigneeLabel = r => !r || (!r.assignee && !r.assigneeUid) ? "" : (r.assigneeUid && r.assigneeUid === TR.uid) ? "you" : (r.assignee || TR.names[r.assigneeUid] || "a teammate");
+const isMine = r => !!r && (r.assigneeUid ? r.assigneeUid === TR.uid : !!r.assignee && (asgNorm(r.assignee) === "me" || (!!TR.myName && asgNorm(r.assignee) === asgNorm(TR.myName))));
+function assigneePatch(name) {
+  const n = String(name || "").trim();
+  const me = !!n && (asgNorm(n) === "me" || asgNorm(n) === "you" || (!!TR.myName && asgNorm(n) === asgNorm(TR.myName)));
+  return { assignee: me ? (TR.myName || "Me") : n, assigneeUid: me ? TR.uid : "" };
+}
+function renderAssignBar() {
+  $("asg-filter").value = state.asgFilter;
+  const names = new Set();
+  for (const r of TR.results.values()) { if (r.assignee) names.add(r.assignee); if (r.testerText) names.add(r.testerText); }
+  if (TR.myName) names.add(TR.myName);
+  $("asg-names").replaceChildren(...[...names].map(n => el("option", { value: n })));
+  const ro = TR.canWrite === false;
+  ["asg-name", "asg-apply", "asg-me"].forEach(id => { $(id).disabled = ro; });
+}
+async function assignUnassigned(name) {
+  if (!state.current) return;
+  const patch = assigneePatch(name);
+  if (!patch.assignee) return toast("Type a tester's name first.");
+  const f = state.current.flow, an = state.an, g = genPaths(f, an);
+  const todo = g.paths.filter(p => !assigneeLabel(TR.results.get(pathKeyOf(f, p))));
+  if (!todo.length) return toast("Every path already has a tester.");
+  try { for (const p of todo) await saveResult(f, an, p, { ...patch }, { assignOnly: true }); }
+  catch (e) { toast(writeError(e)); renderTests(); return; }
+  $("asg-name").value = "";
+  renderTests();
+  toast(`Assigned ${todo.length} path${todo.length === 1 ? "" : "s"} to ${patch.assigneeUid && patch.assigneeUid === TR.uid ? "you" : patch.assignee}.`);
+}
+$("asg-filter").addEventListener("change", e => { state.asgFilter = e.target.value; openWalk = null; renderTests(); });
+$("asg-apply").addEventListener("click", () => assignUnassigned($("asg-name").value));
+$("asg-name").addEventListener("keydown", e => { if (e.key === "Enter") assignUnassigned($("asg-name").value); });
+$("asg-me").addEventListener("click", () => assignUnassigned("me"));
 // Opens the path's steps right under its row (one open at a time): each step, then the branch the call takes.
 let openWalk = null;
 function toggleWalk(row, btn, i, p) {
@@ -2867,28 +3333,9 @@ function toggleWalk(row, btn, i, p) {
   });
   const last = p.nodes[p.nodes.length - 1];
   list.append(el("li", { class: "walk-end small", text: `■ Ends at ${capName(f, last)} (${p.end})` }));
-  row.after(el("tr", { class: "walk-row" }, el("td", { colspan: "5" }, list, resultForm(f, an, p, i, list))));
+  row.after(el("tr", { class: "walk-row" }, el("td", { colspan: "6" }, list, resultForm(f, an, p, i, list))));
   btn.textContent = "Hide"; btn.setAttribute("aria-expanded", "true");
 }
-function renderSim() {
-  const f = state.current.flow, an = state.an;
-  if (!state.sim.node) {
-    state.sim.node = an.roots[0] ?? (f.actions[0] && f.actions[0].id);
-    state.sim.log = [];
-  }
-  const node = f.actions.find(a => a.id === state.sim.node);
-  const box = $("sim"); if (!box) return; box.replaceChildren();
-  if (!node) return;
-  const outs = (an.out.get(node.id) || []).map(i => f.edges[i]);
-  box.append(
-    el("p", null, el("b", { text: `Now at #${node.id} ${node.caption || node.type}` }), el("span", { class: "muted", text: ` · ${CATS[node.cat]}` })),
-    el("ol", { class: "list small muted" }, state.sim.log.map(s => el("li", { text: s }))),
-    outs.length ? el("div", { class: "list" }, outs.map(e => el("button", { type: "button", class: "branchbtn",
-      text: `${e.label ? e.label : "Next"} → #${e.to} ${capName(f, e.to)}`,
-      onclick: () => { state.sim.log.push(`${node.caption || node.type} → ${e.label || "Next"}`); state.sim.node = e.to; renderSim(); } })))
-      : el("p", { class: "small", text: "The call ends here. Restart to walk another route." }));
-}
-$("sim-reset")?.addEventListener("click", () => { state.sim = { node: null, log: [] }; if (state.current) renderSim(); });
 $("save-tests").addEventListener("click", () => {
   if (!state.current) return;
   saveFile(safeName(state.current.name) + "-tests.csv", testsCsv());
@@ -2907,7 +3354,7 @@ const safeName = s => String(s || "flow").replace(/[^a-z0-9]+/gi, "-").replace(/
 // they stay in this browser. A cycle keeps a copy of the flow, so teammates can open it without the file.
 // Each result stores a fingerprint of every step on its path; when a newer version changes one of those steps,
 // the result shows "Needs retest".
-const TR = { db: null, user: null, assets: null, uid: "", canWrite: null, cycles: [], results: new Map(), cycleId: null, unsub: null, names: {}, loaded: false };
+const TR = { db: null, user: null, assets: null, uid: "", myName: "", canWrite: null, cycles: [], results: new Map(), cycleId: null, unsub: null, names: {}, loaded: false };
 const TR_LOCAL = "cxwb.tests.v1";
 const STATUS = { pass: "Pass", fail: "Fail", blocked: "Blocked", notrun: "Not run" };
 const STATUS_ALL = { ...STATUS, inprogress: "In progress" };
@@ -2922,15 +3369,13 @@ function stepSig(f, an, id) {
 function localLoad() { try { const d = JSON.parse(localStorage.getItem(TR_LOCAL) || "{}"); return { cycles: d.cycles || [], results: d.results || {} }; } catch (e) { return { cycles: [], results: {} }; } }
 function localSave(d) { try { localStorage.setItem(TR_LOCAL, JSON.stringify(d)); } catch (e) { toast("Browser storage is full, so this result wasn't kept."); } }
 
-const TESTER_KEY = "cxwb.tester";
-function localTester() { try { return localStorage.getItem(TESTER_KEY) || ""; } catch (e) { return ""; } }
 async function initTests() {
-  if (STANDALONE) {
-    $("tester-wrap").hidden = false; $("tester-name").value = localTester();
-    $("tester-name").addEventListener("change", () => { try { localStorage.setItem(TESTER_KEY, $("tester-name").value.trim()); } catch (e) {} });
-  }
   TR.db = await getNs("db"); TR.user = await getNs("user"); TR.assets = await getNs("assets");
-  if (TR.user) { try { TR.uid = (await TR.user.id()) || ""; } catch (e) {} try { TR.canWrite = TR.user.can ? TR.user.can("data.write") : null; } catch (e) {} }
+  if (TR.user) {
+    try { TR.uid = (await TR.user.id()) || ""; } catch (e) {}
+    try { TR.canWrite = TR.user.can ? TR.user.can("data.write") : null; } catch (e) {}
+    try { if (TR.uid && TR.user.profiles) { const ps = await TR.user.profiles([TR.uid]); TR.myName = (ps && ps[TR.uid] && ps[TR.uid].name) || ""; } } catch (e) {}
+  }
   if (TR.db) {
     TR.db.collection("testcycles").orderBy("createdAt", "desc").onSnapshot(snap => {
       TR.cycles = snap.docs.map(d => ({ ...d.data(), id: d.id })); TR.loaded = true; trRefresh();
@@ -3006,19 +3451,23 @@ function statusFromSteps(p, steps) {
   return { status: p.nodes.some(id => steps[id]) ? "inprogress" : "notrun", failedStep: "" };
 }
 // Merge a change into a path's result and save it. Step ticks recompute the status unless one was chosen by hand.
-async function saveResult(f, an, p, patch) {
+async function saveResult(f, an, p, patch, opts) {
+  const assignOnly = !!(opts && opts.assignOnly);
   const c = await ensureCycleFor();
   const prev = TR.results.get(pathKeyOf(f, p)) || {};
   const sigs = {}; for (const id of p.nodes) sigs[id] = stepSig(f, an, id);
   for (const k of Object.keys(patch)) if (patch[k] === undefined) delete patch[k];
-  const rec = { env: c.env, steps: {}, evidence: [], ...prev, ...patch, cycleId: c.id, flowKey: c.flowKey, pathKey: pathKeyOf(f, p), pathName: pathName(f, p), nodes: p.nodes, tester: TR.uid, testedAt: Date.now(), sigs };
-  delete rec.docId; delete rec.carried;
-  if (!("testerText" in patch)) delete rec.testerText;
-  if (STANDALONE && !rec.testerText) rec.testerText = localTester() || "Tester";
-  if (patch.steps && !patch.status) Object.assign(rec, statusFromSteps(p, rec.steps));
+  const rec = { env: c.env, steps: {}, evidence: [], ...prev, ...patch, cycleId: c.id, flowKey: c.flowKey, pathKey: pathKeyOf(f, p), pathName: pathName(f, p), nodes: p.nodes };
+  delete rec.docId;
+  if (assignOnly) { if (!rec.sigs) rec.sigs = sigs; }
+  else {
+    rec.tester = TR.uid; rec.testedAt = Date.now(); rec.sigs = sigs;
+    delete rec.carried;
+    if (!("testerText" in patch)) delete rec.testerText;
+    if (patch.steps && !patch.status) Object.assign(rec, statusFromSteps(p, rec.steps));
+  }
   await saveResultDoc(rec);
-  if (!TR.db || !TR.results.has(rec.pathKey)) TR.results.set(rec.pathKey, rec);
-  else TR.results.set(rec.pathKey, rec);
+  TR.results.set(rec.pathKey, rec);
   return rec;
 }
 function writeError(e) {
@@ -3035,7 +3484,7 @@ function renderCycleBar(g) {
   pick.value = TR.cycleId || "";
   pick.disabled = !list.length;
   const c = currentCycle();
-  const where = TR.db ? "Shared with everyone who can open this page." : STANDALONE ? "Saved in this browser. To combine a team's results, share the Excel test sheet and upload each filled copy." : "Saved in this browser only, because shared storage isn't available here.";
+  const where = TR.db ? "Shared with everyone who can open this page." : "Saved in this browser only, because shared storage isn't available here.";
   $("cycle-note").textContent = c
     ? `${c.name} (${c.env}), started ${new Date(c.createdAt).toLocaleDateString()}${c.fromName ? `, carried over from ${c.fromName}` : ""}. ${where}`
     : `Start a test cycle to record results for each path. ${where}`;
@@ -3146,7 +3595,7 @@ function resultForm(f, an, p, i, list) {
       const cur = steps[id];
       if (cur && cur.ok === ok) delete steps[id]; else steps[id] = { ok, at: Date.now(), note: ok ? "" : (cur && cur.note) || "" };
       list.querySelectorAll(".walk-step").forEach(x => x._paint && x._paint());
-      try { const rec = await saveResult(f, an, p, { steps: { ...steps } }); status = rec.status; failed = rec.failedStep || ""; if (!TR.db || !list.isConnected) { renderTests(); return; } setStatus(status, true); refreshRow(); }
+      try { const rec = await saveResult(f, an, p, { steps: { ...steps } }); status = rec.status; failed = rec.failedStep || ""; setStatus(status, true); refreshRow(); }
       catch (e) { toast(writeError(e)); }
     };
     okB.addEventListener("click", () => tick(true)); noB.addEventListener("click", () => tick(false));
@@ -3157,7 +3606,7 @@ function resultForm(f, an, p, i, list) {
     li._paint = paint; paint();
   });
   const refreshRow = () => {
-    const row = list.closest("tr").previousElementSibling, cell = row && row.children[3];
+    const row = list.closest("tr").previousElementSibling, cell = row && row.querySelector(".rescell");
     if (cell) { const pr2 = pathResult(f, an, p); cell.replaceChildren(resultPill(pr2)); if (pr2.r && pr2.r.testedAt) cell.append(el("span", { class: "rmeta" }, (pr2.r.testerText ? el("span", { text: pr2.r.testerText }) : el("span", { "data-uid": pr2.r.tester || "", text: testerName(pr2.r.tester) })), ` · ${new Date(pr2.r.testedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`)); }
     renderTestStats();
   };
@@ -3170,6 +3619,18 @@ function resultForm(f, an, p, i, list) {
   const [fKeys, iKeys] = inp("Keys pressed", r.keys ?? d.keys, "1, 2");
   const [fTod, iTod] = inp("Time of day / condition", r.tod ?? d.tod, "Open, after hours, holiday…");
   const notes = el("textarea", { placeholder: "What actually happened: prompts heard, where the call went, any error." }); notes.value = r.notes || "";
+  const asgIn = el("input", { type: "text", value: r.assignee || "", placeholder: "Tester name", list: "asg-names", "aria-label": "Assigned to" });
+  const saveAsg = async name => {
+    try {
+      const rec = await saveResult(f, an, p, assigneePatch(name), { assignOnly: true });
+      asgIn.value = rec.assignee || "";
+      const cell = list.closest("tr").previousElementSibling.querySelector(".asgcell");
+      if (cell) cell.replaceChildren(assigneeLabel(rec) || el("span", { class: "muted", text: "—" }));
+      toast(rec.assignee ? `Path ${i + 1} is assigned to ${assigneeLabel(rec)}.` : `Path ${i + 1} is unassigned.`);
+    } catch (e) { toast(writeError(e)); }
+  };
+  asgIn.addEventListener("change", () => saveAsg(asgIn.value));
+  const asgField = el("div", { class: "field asg-field" }, "Assigned to", el("div", { class: "row" }, asgIn, el("button", { type: "button", class: "mini asgme", text: "Me", "aria-label": "Assign this path to me", onclick: () => saveAsg("me") })));
   const evList = el("ul", { class: "evlist" });
   const drawEv = () => evList.replaceChildren(...evidence.map((x, k) => el("li", null,
     el("a", { href: x.url, target: "_blank", rel: "noopener", text: x.name || "Evidence" }),
@@ -3206,18 +3667,18 @@ function resultForm(f, an, p, i, list) {
     readOnly ? null : el("div", { class: "row" }, runBtn));
   if (pr.changed.length) form.append(el("div", { class: "retest-note", text: `Needs retest: ${pr.changed.map(id => capName(f, id)).join(", ")} changed since this result was saved (${STATUS[pr.status]}).` }));
   form.append(seg, stepField,
-    el("div", { class: "resgrid" }, el("label", { class: "field" }, "Environment", envSel), fCid, fAni, fDnis, fKeys, fTod),
+    el("div", { class: "resgrid" }, asgField, el("label", { class: "field" }, "Environment", envSel), fCid, fAni, fDnis, fKeys, fTod),
     el("label", { class: "field" }, "What happened (actual result)", notes),
     el("div", null, el("b", { class: "small", text: "Evidence" }), evList, evRow),
     readOnly ? el("p", { class: "small muted", text: "You have view-only access, so you can't record results here." }) : el("div", { class: "row" }, saveBtn, meta));
   setStatus(status);
-  if (readOnly) { form.querySelectorAll("input, select, textarea, .seg-status button").forEach(x => x.disabled = true); list.querySelectorAll(".tick").forEach(x => x.disabled = true); }
+  if (readOnly) { form.querySelectorAll("input, select, textarea, .seg-status button, .asgme").forEach(x => x.disabled = true); list.querySelectorAll(".tick").forEach(x => x.disabled = true); }
   return form;
 }
 
 function renderTestStats(g) {
   const f = state.current.flow, an = state.an; g = g || genPaths(f, an);
-  const pct = g.total ? Math.round(100 * g.covered / g.total) : 100;
+  const pct = coveragePct(g);
   const sm = summarize(f, an, g.paths), tot = g.paths.length || 1, hasCy = !!currentCycle();
   $("tstats").replaceChildren(
     stat(g.paths.length, "Test paths", "menu"),
@@ -3239,7 +3700,22 @@ function openRunner(f, an, p, i) {
   const back = el("div", { class: "runner-back", role: "dialog", "aria-modal": "true", "aria-label": `Testing path ${i + 1}` });
   const panel = el("div", { class: "runner" }); back.append(panel);
   const close = () => { back.remove(); document.removeEventListener("keydown", onKey); renderTests(); };
-  const onKey = e => { if (e.key === "Escape") close(); };
+  let keys = {};
+  const onKey = e => {
+    if (e.key === "Escape") return close();
+    if (e.key === "Tab") {
+      // Keep Tab inside the runner while it is open.
+      const fs = [...panel.querySelectorAll("button:not(:disabled), textarea")]; if (!fs.length) return;
+      const firstEl = fs[0], lastEl = fs[fs.length - 1], cur = document.activeElement;
+      if (!panel.contains(cur)) { e.preventDefault(); firstEl.focus(); }
+      else if (e.shiftKey && cur === firstEl) { e.preventDefault(); lastEl.focus(); }
+      else if (!e.shiftKey && cur === lastEl) { e.preventDefault(); firstEl.focus(); }
+      return;
+    }
+    if (e.ctrlKey || e.metaKey || e.altKey || /TEXTAREA|INPUT/.test((e.target && e.target.tagName) || "")) return;
+    const fn = keys[String(e.key).toLowerCase()];
+    if (fn) { e.preventDefault(); fn(); }
+  };
   document.addEventListener("keydown", onKey);
   back.addEventListener("click", e => { if (e.target === back) close(); });
   const doNext = id => {
@@ -3252,7 +3728,7 @@ function openRunner(f, an, p, i) {
   };
   const save = async () => { try { await saveResult(f, an, p, { steps: { ...steps } }); } catch (e) { toast(writeError(e)); } };
   const draw = () => {
-    panel.replaceChildren();
+    panel.replaceChildren(); keys = {};
     const done = p.nodes.every(id => steps[id] && steps[id].ok) ;
     const bad = p.nodes.find(id => steps[id] && steps[id].ok === false);
     const bar = el("div", { class: "runner-bar" }, ...p.nodes.map((id, n) => el("i", { class: steps[id] ? (steps[id].ok ? "ok" : "no") : n === k ? "cur" : "" })));
@@ -3273,6 +3749,7 @@ function openRunner(f, an, p, i) {
       if (ok) k = Math.min(p.nodes.length - 1, k + 1);
       draw(); await save();
     };
+    keys = { y: () => mark(true), n: () => mark(false), arrowleft: () => { if (k > 0) { k--; draw(); } }, arrowright: () => { if (k < p.nodes.length - 1) { k++; draw(); } } };
     panel.append(
       el("div", { class: "row between" }, el("b", { text: `Testing path ${i + 1} · step ${k + 1} of ${p.nodes.length}` }), el("button", { type: "button", "aria-label": "Close", text: "×", onclick: close })),
       bar,
@@ -3286,6 +3763,7 @@ function openRunner(f, an, p, i) {
       el("div", { class: "row between" },
         el("button", { type: "button", text: "◀ Back", disabled: k === 0, onclick: () => { k--; draw(); } }),
         el("button", { type: "button", text: "Skip ▶", disabled: k >= p.nodes.length - 1, onclick: () => { k++; draw(); } })));
+    panel.append(el("p", { class: "small muted", text: "Keys: Y as expected · N not as expected · ← back · → skip · Esc close" }));
     panel.querySelector(".rn-ok").focus();
   };
   document.body.append(back); draw();
@@ -3296,53 +3774,52 @@ const EXCELJS = "https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.mi
 let exceljsP = null;
 const loadExcel = () => exceljsP || (exceljsP = new Promise((res, rej) => { const sc = document.createElement("script"); sc.src = EXCELJS; sc.onload = () => res(window.ExcelJS); sc.onerror = () => { exceljsP = null; rej(new Error("The Excel reader couldn't load.")); }; document.head.append(sc); }));
 const SHEET_COLS = [
-  ["Test", 9], ["Path", 46], ["Steps to follow", 60], ["Caller does", 22], ["Expect to end at", 26],
+  ["Test", 9], ["Path", 46], ["Steps to follow", 60], ["Caller does", 22], ["Expect to end at", 26], ["Assigned to", 16],
   ["Result", 13], ["Failed at step (no. or name)", 22], ["Environment", 13], ["Contact / session ID", 20], ["ANI (caller no.)", 16], ["DNIS (no. dialled)", 16],
   ["Tester", 16], ["Tested on", 14], ["Notes (actual result)", 44], ["Path key (don't edit)", 18]];
 async function downloadSheet() {
   if (!state.current) return;
   let X; try { X = await loadExcel(); } catch (e) { toast(e.message + " Use Export results (CSV) instead."); return; }
   const f = state.current.flow, an = state.an, g = genPaths(f, an), c = currentCycle();
-  const wb = new X.Workbook(); wb.creator = "Flow Workbench";
+  const wb = new X.Workbook(); wb.creator = "FlowLens";
   const ws = wb.addWorksheet("Test sheet", { views: [{ state: "frozen", ySplit: 1, xSplit: 2 }] });
   ws.columns = SHEET_COLS.map(([header, width]) => ({ header, width }));
   const head = ws.getRow(1); head.font = { bold: true, color: { argb: "FFFFFFFF" } }; head.height = 30; head.alignment = { vertical: "middle", wrapText: true };
-  head.eachCell((cell, n) => { cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: n >= 6 && n <= 14 ? "FF5B3FD6" : "FF15173D" } }; });
+  head.eachCell((cell, n) => { cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: n >= 6 && n <= 15 ? "FF5B3FD6" : "FF15173D" } }; });
   g.paths.forEach((p, i) => {
     const pr = pathResult(f, an, p), r = pr.r || {}, d = defaultsFor(f, an, p);
     const stepsTxt = p.nodes.map((id, n) => { const e = n < p.edges.length ? f.edges[p.edges[n]] : null; const lab = e ? FLOWTEXT.edgeText(e, an.byId.get(id)?.type, (an.out.get(id) || []).length) : ""; return `${n + 1}. ${capName(f, id)}${lab ? `  →  ${lab}` : ""}`; }).join("\n");
     const res = r.status && r.status !== "notrun" && r.status !== "inprogress" ? STATUS[r.status] : "";
     const failIdx = r.failedStep ? p.nodes.indexOf(r.failedStep) : -1;
-    const row = ws.addRow([`TC-${String(i + 1).padStart(3, "0")}`, pathName(f, p), stepsTxt, [d.keys && `Keys: ${d.keys}`, d.tod && `When: ${d.tod}`].filter(Boolean).join("\n"), `${capName(f, p.nodes[p.nodes.length - 1])} (${p.end})`,
+    const row = ws.addRow([`TC-${String(i + 1).padStart(3, "0")}`, pathName(f, p), stepsTxt, [d.keys && `Keys: ${d.keys}`, d.tod && `When: ${d.tod}`].filter(Boolean).join("\n"), `${capName(f, p.nodes[p.nodes.length - 1])} (${p.end})`, r.assignee || "",
       res, failIdx >= 0 ? `${failIdx + 1}. ${capName(f, r.failedStep)}` : "", r.env || (c ? c.env : "UAT"), r.contactId || "", r.ani || "", r.dnis || "", testerOf(r.tester || r.testerText ? r : null), r.testedAt ? new Date(r.testedAt) : null, r.notes || "", pathKeyOf(f, p)]);
     row.alignment = { vertical: "top", wrapText: true };
-    row.getCell(13).numFmt = "yyyy-mm-dd";
-    for (let n = 6; n <= 14; n++) row.getCell(n).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF4F2FF" } };
+    row.getCell(14).numFmt = "yyyy-mm-dd";
+    for (let n = 6; n <= 15; n++) row.getCell(n).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF4F2FF" } };
   });
   const last = g.paths.length + 1;
   for (let rI = 2; rI <= last; rI++) {
-    ws.getCell(`F${rI}`).dataValidation = { type: "list", allowBlank: true, formulae: ['"Pass,Fail,Blocked,Not run"'], showErrorMessage: true, errorTitle: "Result", error: "Choose Pass, Fail, Blocked or Not run." };
-    ws.getCell(`H${rI}`).dataValidation = { type: "list", allowBlank: true, formulae: ['"DEV,UAT,PROD,Other"'] };
-    ws.getCell(`M${rI}`).dataValidation = { type: "date", operator: "greaterThan", allowBlank: true, formulae: [new Date(2000, 0, 1)] };
+    ws.getCell(`G${rI}`).dataValidation = { type: "list", allowBlank: true, formulae: ['"Pass,Fail,Blocked,Not run"'], showErrorMessage: true, errorTitle: "Result", error: "Choose Pass, Fail, Blocked or Not run." };
+    ws.getCell(`I${rI}`).dataValidation = { type: "list", allowBlank: true, formulae: ['"DEV,UAT,PROD,Other"'] };
+    ws.getCell(`N${rI}`).dataValidation = { type: "date", operator: "greaterThan", allowBlank: true, formulae: [new Date(2000, 0, 1)] };
   }
   const cf = (text, argb) => ({ type: "containsText", operator: "containsText", text, style: { fill: { type: "pattern", pattern: "solid", bgColor: { argb } }, font: { bold: true } } });
-  ws.addConditionalFormatting({ ref: `F2:F${last}`, rules: [cf("Pass", "FFC8F2E3"), cf("Fail", "FFFFD3E0"), cf("Blocked", "FFFFEBC2"), cf("Not run", "FFE6E8F5")] });
-  ws.getColumn(15).hidden = true;
-  ws.autoFilter = { from: "A1", to: `N${last}` };
+  ws.addConditionalFormatting({ ref: `G2:G${last}`, rules: [cf("Pass", "FFC8F2E3"), cf("Fail", "FFFFD3E0"), cf("Blocked", "FFFFEBC2"), cf("Not run", "FFE6E8F5")] });
+  ws.getColumn(16).hidden = true;
+  ws.autoFilter = { from: "A1", to: `O${last}` };
   const info = wb.addWorksheet("How to use");
   info.columns = [{ width: 110 }];
   [`Test sheet for ${state.current.name} (${PLAT[platOf(state.current)]})${c ? ` · cycle ${c.name} (${c.env})` : ""}`, "",
     "1. Follow 'Steps to follow' for each test. 'Caller does' lists the keys to press and when to call.",
-    "2. Fill in the purple columns: Result (pick from the list), the step where it failed, call details, tester, date and notes.",
-    "3. Save the file, then in Flow Workbench open Test → Upload filled sheet. Results are matched to their paths and shared with your team.",
-    "Leave 'Path key' (hidden column O) and the Test IDs as they are. Rows with an empty Result are skipped."].forEach((t, n) => { const r = info.addRow([t]); if (n === 0) r.font = { bold: true, size: 13 }; r.alignment = { wrapText: true }; });
+    "2. Fill in the purple columns: who the test is assigned to, Result (pick from the list), the step where it failed, call details, tester, date and notes.",
+    "3. Save the file, then in FlowLens open Test → Upload filled sheet. Results are matched to their paths and shared with your team.",
+    "Leave 'Path key' (hidden column P) and the Test IDs as they are. Rows with an empty Result are skipped, apart from saving who they are assigned to."].forEach((t, n) => { const r = info.addRow([t]); if (n === 0) r.font = { bold: true, size: 13 }; r.alignment = { wrapText: true }; });
   const meta = wb.addWorksheet("_meta", { state: "veryHidden" });
   meta.addRow(["flowKey", flowKeyOf(state.current)]); meta.addRow(["cycleId", c ? c.id : ""]);
   const buf = await wb.xlsx.writeBuffer();
   const name = `${safeName(state.current.name)}${c ? "-" + safeName(c.name) : ""}-test-sheet.xlsx`;
-  if (STANDALONE) return browserDownload(name, new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
   const dl = await getNs("downloads");
-  if (!dl) { toast("Saving files isn't available in this view."); return; }
+  if (!dl) { if (window.claude) toast("Saving files isn't available in this view."); else browserSave(name, new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" })); return; }
   try { await dl.save({ filename: name, data: new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }) }); toast("Saved " + name); }
   catch (e) { if (!(e && e.code === "declined")) toast("Couldn't save the sheet" + (e && e.message ? ": " + e.message : ".")); }
 }
@@ -3365,12 +3842,19 @@ async function importSheet(file) {
   } catch (e) { toast("Couldn't read that sheet: " + (e.message || "unknown error")); return; }
   const byKey = new Map(g.paths.map(p => [pathKeyOf(f, p), p])), byId = new Map(g.paths.map((p, i) => [`TC-${String(i + 1).padStart(3, "0")}`, p]));
   const norm = v => String(v || "").trim().toLowerCase();
-  let done = 0, skipped = 0, unmatched = 0; const counts = { pass: 0, fail: 0, blocked: 0, notrun: 0 };
+  let done = 0, skipped = 0, unmatched = 0, assigned = 0; const counts = { pass: 0, fail: 0, blocked: 0, notrun: 0 };
   for (const o of rows) {
-    const resTxt = norm(o["Result"]); if (!resTxt) { skipped++; continue; }
+    const resTxt = norm(o["Result"]), asg = String(o["Assigned to"] ?? "").trim();
     const status = resTxt.startsWith("pass") ? "pass" : resTxt.startsWith("fail") ? "fail" : resTxt.startsWith("block") ? "blocked" : resTxt.startsWith("not") ? "notrun" : "";
-    if (!status) { skipped++; continue; }
     const p = byKey.get(String(o["Path key (don't edit)"] || "").trim()) || byId.get(String(o["Test"] || "").trim());
+    if (!status) {
+      // No result yet: still keep who the path is assigned to.
+      const had = p ? (TR.results.get(pathKeyOf(f, p)) || {}).assignee || "" : "";
+      if (p && asg && asgNorm(asg) !== asgNorm(had)) {
+        try { await saveResult(f, an, p, assigneePatch(asg), { assignOnly: true }); assigned++; } catch (e) { toast(writeError(e)); return; }
+      } else skipped++;
+      continue;
+    }
     if (!p) { unmatched++; continue; }
     let failedStep = "";
     const fs = String(o["Failed at step (no. or name)"] || "").trim();
@@ -3386,13 +3870,16 @@ async function importSheet(file) {
     try {
       await saveResult(f, an, p, { status, failedStep, steps, env: String(o["Environment"] || "").trim() || undefined, contactId: String(o["Contact / session ID"] || "").trim(),
         ani: String(o["ANI (caller no.)"] || "").trim(), dnis: String(o["DNIS (no. dialled)"] || "").trim(), notes: String(o["Notes (actual result)"] || "").trim(),
-        testerText: String(o["Tester"] || "").trim(), imported: file.name });
+        testerText: String(o["Tester"] || "").trim(), imported: file.name, ...(asg ? assigneePatch(asg) : {}) });
       const rec = TR.results.get(pathKeyOf(f, p)); if (rec) rec.testedAt = when;
       done++; counts[status]++;
     } catch (e) { toast(writeError(e)); return; }
   }
   renderTests();
-  toast(done ? `Imported ${done} result${done === 1 ? "" : "s"}: ${counts.pass} pass, ${counts.fail} fail, ${counts.blocked} blocked${counts.notrun ? `, ${counts.notrun} not run` : ""}.${unmatched ? ` ${unmatched} row(s) didn't match a path in this flow.` : ""}` : `No results found in that sheet.${unmatched ? ` ${unmatched} row(s) didn't match a path in this flow.` : " Fill in the Result column first."}`);
+  const extra = (assigned ? ` ${assigned} path${assigned === 1 ? "" : "s"} assigned.` : "") + (unmatched ? ` ${unmatched} row(s) didn't match a path in this flow.` : "");
+  toast(done ? `Imported ${done} result${done === 1 ? "" : "s"}: ${counts.pass} pass, ${counts.fail} fail, ${counts.blocked} blocked${counts.notrun ? `, ${counts.notrun} not run` : ""}.${extra}`
+    : assigned ? `No results in that sheet yet.${extra}`
+    : `No results found in that sheet.${unmatched ? ` ${unmatched} row(s) didn't match a path in this flow.` : " Fill in the Result column first."}`);
 }
 function parseCsv(t) {
   const out = []; let row = [], cur = "", q = false;
@@ -3410,7 +3897,7 @@ function resultsRows() {
   const f = state.current.flow, an = state.an, g = genPaths(f, an), c = currentCycle();
   return g.paths.map((p, i) => {
     const pr = pathResult(f, an, p), r = pr.r || {};
-    return { id: `TC-${String(i + 1).padStart(3, "0")}`, path: pathName(f, p), status: pr.changed.length ? "Needs retest" : STATUS_ALL[pr.status],
+    return { id: `TC-${String(i + 1).padStart(3, "0")}`, path: pathName(f, p), assigned: r.assignee || "", status: pr.changed.length ? "Needs retest" : STATUS_ALL[pr.status],
       failed: r.failedStep ? `${capName(f, r.failedStep)} (#${r.failedStep})` : "", env: r.env || c.env, contactId: r.contactId || "", ani: r.ani || "", dnis: r.dnis || "",
       keys: r.keys || "", tod: r.tod || "", tester: testerOf(r.tester || r.testerText ? r : null), testedAt: r.testedAt ? new Date(r.testedAt).toLocaleString() : "",
       notes: r.notes || "", evidence: (r.evidence || []).map(x => x.url).join(" "), changed: pr.changed.map(id => capName(f, id)).join(", ") };
@@ -3418,8 +3905,8 @@ function resultsRows() {
 }
 $("res-csv").addEventListener("click", () => {
   const c = currentCycle(); if (!c || !state.current) return;
-  const head = ["Test", "Path", "Result", "Went wrong at", "Environment", "Contact ID", "ANI", "DNIS", "Keys", "Time / condition", "Tester", "Tested at", "Notes", "Evidence", "Changed steps"];
-  const rows = resultsRows().map(r => [r.id, r.path, r.status, r.failed, r.env, r.contactId, r.ani, r.dnis, r.keys, r.tod, r.tester, r.testedAt, r.notes, r.evidence, r.changed].map(csvCell).join(","));
+  const head = ["Test", "Path", "Assigned to", "Result", "Went wrong at", "Environment", "Contact ID", "ANI", "DNIS", "Keys", "Time / condition", "Tester", "Tested at", "Notes", "Evidence", "Changed steps"];
+  const rows = resultsRows().map(r => [r.id, r.path, r.assigned, r.status, r.failed, r.env, r.contactId, r.ani, r.dnis, r.keys, r.tod, r.tester, r.testedAt, r.notes, r.evidence, r.changed].map(csvCell).join(","));
   saveFile(`${safeName(state.current.name)}-${safeName(c.name)}-results.csv`, [head.map(csvCell).join(","), ...rows].join("\n"));
 });
 $("res-report").addEventListener("click", () => {
@@ -3438,10 +3925,10 @@ table{border-collapse:collapse;width:100%;font-size:12.5px}th,td{border:1px soli
 @media print{body{margin:12mm}}</style></head><body>
 <h1>Test sign-off: ${esc(state.current.name)}</h1>
 <div class="muted">${esc(PLAT[platOf(state.current)])} · Cycle "${esc(c.name)}" (${esc(c.env)}) · started ${new Date(c.createdAt).toLocaleDateString()} · report ${new Date().toLocaleString()}</div>
-<div class="tiles"><div class="tile"><b>${total}</b>Test paths</div><div class="tile"><b>${rate}%</b>Pass rate</div><div class="tile"><b>${s.pass}</b>Pass</div><div class="tile"><b>${s.fail}</b>Fail</div><div class="tile"><b>${s.blocked}</b>Blocked</div><div class="tile"><b>${s.notrun}</b>Not run</div><div class="tile"><b>${s.retest}</b>Needs retest</div><div class="tile"><b>${g.total ? Math.round(100 * g.covered / g.total) : 100}%</b>Branch coverage</div></div>
+<div class="tiles"><div class="tile"><b>${total}</b>Test paths</div><div class="tile"><b>${rate}%</b>Pass rate</div><div class="tile"><b>${s.pass}</b>Pass</div><div class="tile"><b>${s.fail}</b>Fail</div><div class="tile"><b>${s.blocked}</b>Blocked</div><div class="tile"><b>${s.notrun}</b>Not run</div><div class="tile"><b>${s.retest}</b>Needs retest</div><div class="tile"><b>${coveragePct(g)}%</b>Branch coverage</div></div>
 <div class="verdict">${ready ? "All test paths passed. Ready for sign-off." : `Not ready for sign-off: ${[s.fail && s.fail + " failed", s.blocked && s.blocked + " blocked", s.notrun && s.notrun + " not run", s.retest && s.retest + " need retest"].filter(Boolean).join(", ")}.`}</div>
-<table><thead><tr><th>Test</th><th>Path</th><th>Result</th><th>Went wrong at</th><th>Env</th><th>Contact ID</th><th>ANI / DNIS</th><th>Keys</th><th>Time / condition</th><th>Tester</th><th>Tested</th><th>Notes</th><th>Evidence</th></tr></thead><tbody>
-${rows.map(r => `<tr><td>${esc(r.id)}</td><td>${esc(r.path)}</td><td><span class="pill" style="background:${tone[r.status] || "#6b7099"}">${esc(r.status)}</span>${r.changed ? `<div class="muted">Changed: ${esc(r.changed)}</div>` : ""}</td><td>${esc(r.failed)}</td><td>${esc(r.env)}</td><td>${esc(r.contactId)}</td><td>${esc([r.ani, r.dnis].filter(Boolean).join(" → "))}</td><td>${esc(r.keys)}</td><td>${esc(r.tod)}</td><td>${esc(r.tester)}</td><td>${esc(r.testedAt)}</td><td>${esc(r.notes)}</td><td>${r.evidence.split(" ").filter(Boolean).map((u, k) => `<a href="${esc(u)}">File ${k + 1}</a>`).join(" ")}</td></tr>`).join("\n")}
+<table><thead><tr><th>Test</th><th>Path</th><th>Assigned to</th><th>Result</th><th>Went wrong at</th><th>Env</th><th>Contact ID</th><th>ANI / DNIS</th><th>Keys</th><th>Time / condition</th><th>Tester</th><th>Tested</th><th>Notes</th><th>Evidence</th></tr></thead><tbody>
+${rows.map(r => `<tr><td>${esc(r.id)}</td><td>${esc(r.path)}</td><td>${esc(r.assigned)}</td><td><span class="pill" style="background:${tone[r.status] || "#6b7099"}">${esc(r.status)}</span>${r.changed ? `<div class="muted">Changed: ${esc(r.changed)}</div>` : ""}</td><td>${esc(r.failed)}</td><td>${esc(r.env)}</td><td>${esc(r.contactId)}</td><td>${esc([r.ani, r.dnis].filter(Boolean).join(" → "))}</td><td>${esc(r.keys)}</td><td>${esc(r.tod)}</td><td>${esc(r.tester)}</td><td>${esc(r.testedAt)}</td><td>${esc(r.notes)}</td><td>${r.evidence.split(" ").filter(Boolean).map((u, k) => `<a href="${esc(u)}">File ${k + 1}</a>`).join(" ")}</td></tr>`).join("\n")}
 </tbody></table>
 <div class="sign"><div>QA lead</div><div>Developer</div><div>Business owner</div></div>
 </body></html>`;
@@ -3468,7 +3955,7 @@ function testMarks() {
 function renderCompare() {
   const a = $("cmp-a"), b = $("cmp-b");
   const entries = allEntries();
-  const opts = () => entries.map(e => el("option", { value: e.id, text: `${e.name} (${platOf(e) === "five9" ? "Five9" : "CXone"})` }));
+  const opts = () => entries.map(e => el("option", { value: e.id, text: `${e.name} (${PLAT_SHORT[platOf(e)] || "CXone"})` }));
   a.replaceChildren(...opts()); b.replaceChildren(...opts());
   const known = id => entries.some(e => e.id === id);
   if (!known(state.cmpA)) state.cmpA = state.current ? state.current.id : entries[0].id;
@@ -3575,7 +4062,7 @@ function sideBySide(A, B, mA, mB, same) {
         el("div", { class: "row", style: "gap: 8px; min-width: 0" },
           el("span", { class: "ab " + side.toLowerCase(), text: side }),
           el("b", { class: "sbs-name", text: e.name }),
-          el("span", { class: "plat sm " + platOf(e), text: platOf(e) === "five9" ? "Five9" : "CXone" })),
+          el("span", { class: "plat sm " + platOf(e), text: PLAT_SHORT[platOf(e)] || "CXone" })),
         el("div", { class: "row", style: "gap: 6px" },
           el("button", { type: "button", class: "mini", "aria-label": "Zoom out", text: "−", onclick: () => api && api.zoom(1.25) }),
           el("button", { type: "button", class: "mini", "aria-label": "Zoom in", text: "+", onclick: () => api && api.zoom(0.8) }),
@@ -3613,11 +4100,14 @@ function renderCmpDetail() {
         : el("p", { class: "small muted", text: "No outgoing branch." }));
   };
   box.append(el("div", { class: same ? "grid2" : "view" }, sides.map(([s, e]) => cardFor(s, e))));
+  const d = same && state.cmpDiffs && state.cmpDiffs.get(state.cmpSel.id);
+  if (d) box.append(el("div", { class: "card plain" }, el("h3", { text: `What changed in this step (${d.length})` }), el("ul", { class: "list small" }, d.map(x => el("li", { text: x })))));
 }
 
 function renderCompareOut() {
   const A = allEntries().find(e => e.id === state.cmpA), B = allEntries().find(e => e.id === state.cmpB);
   const out = $("cmp-out"); out.replaceChildren(); minis = [];
+  state.cmpDiffs = null;
   if (!A || !B) return;
   if (A === B) { out.append(el("div", { class: "empty", text: "Pick two different flows to compare." })); return; }
   const fa = A.flow, fb = B.flow;
@@ -3626,7 +4116,20 @@ function renderCompareOut() {
   const ma =new Map(fa.actions.map(x => [x.id, x])), mb = new Map(fb.actions.map(x => [x.id, x]));
   const added = fb.actions.filter(x => !ma.has(x.id));
   const removed = fa.actions.filter(x => !mb.has(x.id));
-  const changed = fb.actions.filter(x => ma.has(x.id) && (ma.get(x.id).type !== x.type || ma.get(x.id).caption !== x.caption));
+  // A step has changed when its type, caption or any setting differs. Branch changes are listed separately below.
+  const short = v => v === undefined ? "(not set)" : `"${trunc(String(v).replace(/\s+/g, " "), 70)}"`;
+  const diffStep = (a, b) => {
+    const d = [];
+    if (a.type !== b.type) d.push(`Type: ${a.type} → ${b.type}`);
+    if ((a.caption || "") !== (b.caption || "")) d.push(`Caption: ${short(a.caption || "")} → ${short(b.caption || "")}`);
+    const pa = new Map(a.props.map(p => [p.k, p.v])), pb = new Map(b.props.map(p => [p.k, p.v]));
+    for (const k of new Set([...pa.keys(), ...pb.keys()])) if (pa.get(k) !== pb.get(k)) d.push(`${k}: ${short(pa.get(k))} → ${short(pb.get(k))}`);
+    return d;
+  };
+  const diffs = new Map();
+  for (const x of fb.actions) if (ma.has(x.id)) { const d = diffStep(ma.get(x.id), x); if (d.length) diffs.set(x.id, d); }
+  state.cmpDiffs = diffs;
+  const changed = fb.actions.filter(x => diffs.has(x.id));
   const ek = f => new Map(f.edges.map(e => [`${e.from}>${e.to}:${e.label || ""}`, e]));
   const ea = ek(fa), eb = ek(fb);
   const eAdded = [...eb.keys()].filter(k => !ea.has(k)).map(k => eb.get(k));
@@ -3648,7 +4151,7 @@ function renderCompareOut() {
   const blocks = [
     row("Steps added", added, stepFmt),
     row("Steps removed", removed, stepFmt),
-    row("Steps changed", changed, x => `#${x.id}: ${ma.get(x.id).caption || ma.get(x.id).type} → ${x.caption || x.type}`),
+    row("Steps changed", changed, x => { const d = diffs.get(x.id); return `#${x.id} ${x.caption || x.type}: ${d.slice(0, 3).join("; ")}${d.length > 3 ? `; and ${d.length - 3} more` : ""}`; }),
     row("Branches added", eAdded, edgeFmt),
     row("Branches removed", eRemoved, edgeFmt)
   ].filter(Boolean);
@@ -3722,7 +4225,7 @@ document.querySelectorAll("[data-preset]").forEach(b => b.addEventListener("clic
   const p = b.dataset.preset;
   if (p === "MIGRATE") {
     if (!state.current) return toast("Open a flow first.");
-    const other = platOf(state.current) === "five9" ? "NICE CXone Studio" : "Five9 IVR";
+    const other = PLAT[$("mig-target").value] || "Five9 IVR";
     $("claude-q").value = `Describe how to rebuild this flow in ${other}. For each step, give the equivalent ${other} action or module and the settings to carry over. Then list behaviour with no direct equivalent, such as business-hours checks, queue treatment, error exits and subscripts, and say how to handle each.`;
     return;
   }
@@ -3740,21 +4243,20 @@ document.querySelectorAll("[data-preset]").forEach(b => b.addEventListener("clic
 function renderClaude() {
   const has = !!state.current;
   let note = has
-    ? (STANDALONE ? `Uma copies your question with this flow's ${state.current.flow.actions.length} steps, branches and findings, and opens Claude under your own login.` : `Uma (powered by Claude) reads this flow's ${state.current.flow.actions.length} steps, branches and findings with each question, and nothing else.`)
+    ? `Uma (powered by Claude) reads this flow's ${state.current.flow.actions.length} steps, branches and findings with each question, and nothing else.`
     : "Open a flow first. Uma reads the flow's steps, branches and findings.";
   if (state.claudeFocus && has) note += ` Focused on step #${state.claudeFocus}.`;
   $("claude-note").textContent = note;
+  // Offer every platform except the one the open flow is on.
+  const mt = $("mig-target"), cur = has ? platOf(state.current) : "", keep = mt.value;
+  mt.replaceChildren(...Object.keys(PLAT).filter(k => k !== cur).map(k => el("option", { value: k, text: PLAT[k] })));
+  if (keep && keep !== cur) mt.value = keep;
   $("ask").disabled = !has || state.busy;
 }
 async function askClaude() {
   const q = $("claude-q").value.trim();
   if (!state.current) return toast("Open a flow first.");
   if (!q) return toast("Type a question or pick a preset.");
-  if (STANDALONE) {
-    const focus = state.claudeFocus ? `\nI'm focused on step #${state.claudeFocus}.` : "";
-    $("claude-out").textContent = "Your question is in Claude. Paste it there to get the answer.";
-    return sendToClaude(`I'm a CCaaS architect reviewing a ${PLAT[platOf(state.current)]} call flow. Name node numbers and captions when you refer to steps. Plain sentences; short bullets are fine; no tables.${focus}\n\nTask: ${q}\n\nFLOW DATA:\n${buildContext()}`, "question");
-  }
   const out = $("claude-out");
   out.textContent = ""; setBusy(true, "Your question is important to Uma. Please hold…");
   const ns = await getNs("sample");
@@ -3817,6 +4319,8 @@ function renderExport() {
     const lines = [`# Review: ${state.current.name}`, "", `Platform: ${PLAT[platOf(state.current)]}. Steps: ${f.actions.length}. Branches: ${f.edges.length}. Reachable: ${an.reach.size} of ${f.actions.length}.`, "", "## Findings", ""];
     if (!an.findings.length) lines.push("No findings.");
     an.findings.forEach(x => lines.push(`- **${x.sev.toUpperCase()}**: ${x.title}. ${x.text}`));
+    const stray = f.actions.filter(a => !an.reach.has(a.id));
+    if (stray.length) { lines.push("", "## Not connected to the call path", ""); stray.forEach(a => lines.push(`- #${a.id} ${a.caption || a.type} (${a.type})`)); }
     text = lines.join("\n");
   }
   $("exp-out").value = text;
@@ -3827,6 +4331,38 @@ $("exp-save").addEventListener("click", () => {
   const fmt = $("exp-format").value;
   const ext = { mermaid: "mmd.txt", actions: "csv", tests: "csv", gherkin: "feature.txt", report: "md" }[fmt];
   saveFile(`${safeName(state.current.name)}-${fmt}.${ext}`, $("exp-out").value);
+});
+
+// ---------- Keyboard ----------
+document.querySelector(".tabs").addEventListener("keydown", e => {
+  const tabs = [...document.querySelectorAll(".tabs [data-view]")], i = tabs.indexOf(document.activeElement);
+  if (i < 0) return;
+  const j = e.key === "ArrowRight" ? (i + 1) % tabs.length : e.key === "ArrowLeft" ? (i + tabs.length - 1) % tabs.length : e.key === "Home" ? 0 : e.key === "End" ? tabs.length - 1 : -1;
+  if (j < 0) return;
+  e.preventDefault(); go(tabs[j].dataset.view); tabs[j].focus();
+});
+document.addEventListener("keydown", e => {
+  if (e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented) return;
+  const tg = e.target, tag = (tg && tg.tagName) || "";
+  if (/^(INPUT|TEXTAREA|SELECT)$/.test(tag) || (tg && tg.isContentEditable) || document.querySelector(".runner-back")) return;
+  if (/^[1-7]$/.test(e.key)) {
+    const v = VIEWS[+e.key - 1];
+    e.preventDefault(); go(v);
+    const b = document.querySelector(`.tabs [data-view="${v}"]`); if (b) b.focus();
+    return;
+  }
+  if (!$("v-review").hidden && state.current && state.mode === "chart" && tg && tg.closest && tg.closest("#chartbox")) {
+    const box = $("chartbox");
+    if (e.key === "+" || e.key === "=") { e.preventDefault(); zoomAt(1.2, box.clientWidth / 2, box.clientHeight / 2); }
+    else if (e.key === "-" || e.key === "_") { e.preventDefault(); zoomAt(0.83, box.clientWidth / 2, box.clientHeight / 2); }
+    else if (e.key === "0") { e.preventDefault(); fit(true); }
+  }
+});
+$("outline").addEventListener("keydown", e => {
+  if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+  const items = [...$("outline").querySelectorAll(".ol-name")].filter(b => b.offsetParent !== null), i = items.indexOf(document.activeElement);
+  const next = i < 0 ? null : items[i + (e.key === "ArrowDown" ? 1 : -1)];
+  if (next) { e.preventDefault(); next.focus(); }
 });
 
 // ---------- Boot ----------
@@ -3841,5 +4377,4 @@ window.addEventListener("resize", () => { if (!$("v-review").hidden && state.cur
 })();
 </script>
 
-</body>
-</html>
+</body></html>
