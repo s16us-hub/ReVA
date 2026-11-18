@@ -161,6 +161,9 @@
   .cycle-card select { min-height: 40px; max-width: 320px; }
   .cycle-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px 14px; align-items: end; margin-top: 12px; padding: 12px; border-radius: 12px; background: var(--raised); }
   .cycle-form[hidden] { display: none; }
+  .tester-field { max-width: 320px; margin-top: 10px; }
+  .tester-field input { min-height: 40px; }
+  .tester-field[hidden] { display: none; }
   .passbar { display: flex; height: 10px; border-radius: 999px; overflow: hidden; background: var(--line); margin-top: 6px; }
   .passbar i { display: block; height: 100%; }
   .rpill { display: inline-flex; align-items: center; gap: 6px; font: 700 12px/1 var(--ui); padding: 5px 10px; border-radius: 999px; white-space: nowrap; border: 1.5px solid var(--line); background: var(--card); color: var(--ink-2); }
@@ -607,6 +610,7 @@
           <label class="field">Start from <select id="cy-from"></select></label>
           <div class="row"><button type="button" class="primary" id="cy-create">Create cycle</button><button type="button" id="cy-cancel">Cancel</button></div>
         </div>
+        <label class="field tester-field" id="tester-wrap" hidden>Your name <input id="tester-name" type="text" autocomplete="name" placeholder="Shown on results you record"></label>
         <p class="small muted" id="cycle-note"></p>
         <div class="passbar" id="passbar" aria-hidden="true"></div>
       </div>
@@ -1943,7 +1947,11 @@ function analyze(f, ref, knownScripts) {
       // One finding per stray step: an orphan has no links at all, an unreachable step still points somewhere.
       if (!o.length && !inc.get(a.id).length) add("med", "Orphan step", `${nm} isn't connected to anything: no step leads to it and it leads nowhere. It does nothing and can be removed.`, a.id);
       else add("med", "Unreachable action", `${nm} can't be reached from ${guessed ? "the start step" : "Begin or any event"}. It may be left over from an earlier version.${o.length ? "" : " It also has no outgoing branch."}`, a.id);
-    } else if (!o.length && a.cat !== "end" && !eventOnly.has(a.id) && !FLOWTEXT.isHandoff(a)) add("med", "Dead end", `${nm} has no outgoing branch, so the call stops here without a hang-up or end action.`, a.id);
+    } else if (!o.length && a.cat !== "end" && !eventOnly.has(a.id) && !FLOWTEXT.isHandoff(a)) {
+      // A queue step (such as CXone's Reqagent) often ends a branch on purpose, because the caller waits there for an agent.
+      if (a.cat === "queue") add("low", "Queue step has nothing after it", `${nm} queues the caller and has no branch after it. That is often fine, because the caller waits for an agent. Check whether calls that leave the queue without an agent need a fallback, such as a message, voicemail or hang-up.`, a.id);
+      else add("med", "Dead end", `${nm} has no outgoing branch, so the call stops here without a hang-up or end action.`, a.id);
+    }
     if (T === "SNIPPET" && reach.has(a.id)) {
       // A code block that is wired in but empty or fully commented out.
       const cp = a.props.find(p => /^(data|code)$/i.test(String(p.k).split(".").pop()));
@@ -1960,19 +1968,20 @@ function analyze(f, ref, knownScripts) {
         if (!labels.some(isDefault) && !hasTimeout) add("med", "Menu has no timeout branch", `${nm} doesn't handle a caller who presses nothing.`, a.id);
         if (!labels.some(isDefault) && !hasInvalid) add("med", "Menu has no invalid-input branch", `${nm} doesn't handle a key that isn't a menu option.`, a.id);
         if (cx && labels.some(isDefault) && !hasTimeout && o.length > 1) add("low", "Menu timeout falls through to Default", `${nm} has no Timeout branch, so a caller who presses nothing takes the Default branch, the same route as any other unhandled input. Add a Timeout branch if silence should be treated differently, for example with a reprompt.`, a.id);
-        // A non-key branch that runs straight back to the menu, with no step in between that can break out.
-        for (const e of o) {
-          if (/^(\d+|[*#])$/.test((e.label || "").trim())) continue;
-          let cur = e.to, back = false; const seenR = new Set();
-          for (let hops = 0; hops < 15; hops++) {
-            if (cur === a.id) { back = true; break; }
-            if (seenR.has(cur)) break; seenR.add(cur);
-            const next = [...new Set((out.get(cur) || []).map(i => f.edges[i].to))];
-            if (next.length !== 1) break;
-            cur = next[0];
-          }
-          if (back) { add("med", "Menu retries with no limit", `${nm}: the ${FLOWTEXT.friendly(e.label) || "default"} branch leads straight back to the menu with no retry counter, so a caller who never presses a valid key hears the menu forever. Add a counter (for example a Loop step) that exits after two or three tries.`, a.id); break; }
+      }
+      // A non-key branch that runs straight back to the menu, with no step in between that can break out.
+      // Five9 too: a No Match that plays a prompt and returns to the menu starts its attempts over each time.
+      for (const e of o) {
+        if (/^(\d+|[*#])$/.test((e.label || "").trim())) continue;
+        let cur = e.to, back = false; const seenR = new Set();
+        for (let hops = 0; hops < 15; hops++) {
+          if (cur === a.id) { back = true; break; }
+          if (seenR.has(cur)) break; seenR.add(cur);
+          const next = [...new Set((out.get(cur) || []).map(i => f.edges[i].to))];
+          if (next.length !== 1) break;
+          cur = next[0];
         }
+        if (back) { add("med", "Menu retries with no limit", `${nm}: the ${FLOWTEXT.friendly(e.label) || "default"} branch leads straight back to the menu with no retry counter, so a caller who never presses a valid key hears the menu forever. Add a counter (for example ${f9 ? "Set Variable with an If/Else" : "a Loop step"}) that exits after two or three tries.`, a.id); break; }
       }
     }
     if (f9 && /^case$/i.test(a.type) && o.length && !labels.some(l => /no.?match|default|else/i.test(l))) add("med", "Case has no No Match branch", `${nm} has no branch for a value that matches none of the cases.`, a.id);
@@ -2004,8 +2013,8 @@ function analyze(f, ref, knownScripts) {
         const m = codeOf(a).match(/^[ \t]*IF[ \t]+([^\r\n{]*?)[ \t]*\r?\n[ \t]*\{[ \t]*\r?\n?[ \t]*\}/im);
         if (m) add("med", "Empty IF block", `${nm} has an IF on "${m[1]}" with an empty body, so nothing under it runs. The assignments after it run every time. Check whether the condition is a placeholder.`, a.id);
       }
-      // 2c. A subflow call with only a Default exit: a failed subflow carries on silently.
-      if (a.cat === "sub" && reach.has(a.id) && o.length && !labels.some(l => /error|fail|exception|time.?out/i.test(l))) add("med", "Subflow call has no failure exit", `${nm} calls a subscript but has no branch for a failed or timed-out call, so the flow carries on as if it worked. If the subscript can fail, add an error branch.`, a.id);
+      // 2c. A subflow call with only a Default exit: worth a check, since a failed subflow would carry on silently.
+      if (a.cat === "sub" && reach.has(a.id) && o.length && !labels.some(l => /error|fail|exception|time.?out/i.test(l))) add("low", "Subflow call has no failure branch", `${nm} calls a subscript and has no branch for a failed or timed-out call. Many subscripts handle their own errors, so this is often fine. Check whether this one can fail; if it can, add an error branch so the flow doesn't carry on as if it worked.`, a.id);
       // 2d. A fixed queue or work-item number in a queue step (these often differ between environments).
       if (a.cat === "queue" || /QUEUE/i.test(a.type)) {
         const lit = a.props.find(p => /^\d{6,}$/.test(String(p.v).trim()));
@@ -2188,7 +2197,7 @@ function genPaths(f, an, max = 40) {
   const CAP = 150;
   const paths = [], covered = new Set();
   let visits = 0;
-  const endOf = id => { const a = an.byId.get(id); return !a ? "dead end" : a.cat === "end" ? "end" : FLOWTEXT.isHandoff(a) ? "handoff" : "dead end"; };
+  const endOf = id => { const a = an.byId.get(id); return !a ? "dead end" : a.cat === "end" ? "end" : FLOWTEXT.isHandoff(a) ? "handoff" : a.cat === "queue" ? "in queue" : "dead end"; };
   const record = (nodes, edgeIdx, end) => {
     if (!edgeIdx.some(i => !covered.has(i))) return;
     edgeIdx.forEach(i => covered.add(i));
@@ -3273,10 +3282,21 @@ const coveragePct = g => { const n = g.total - g.untestable; return n > 0 ? Math
 // Each path can carry a tester's name. Assigning a path doesn't count as testing it: the result and its date stay as they were.
 const asgNorm = v => String(v || "").trim().toLowerCase();
 const assigneeLabel = r => !r || (!r.assignee && !r.assigneeUid) ? "" : (r.assigneeUid && r.assigneeUid === TR.uid) ? "you" : (r.assignee || TR.names[r.assigneeUid] || "a teammate");
-const isMine = r => !!r && (r.assigneeUid ? r.assigneeUid === TR.uid : !!r.assignee && (asgNorm(r.assignee) === "me" || (!!TR.myName && asgNorm(r.assignee) === asgNorm(TR.myName))));
+// Without a signed-in id, "mine" means the name typed in Your name, so a sheet passed between testers doesn't make every path everyone's.
+const isMine = r => !!r && (r.assigneeUid ? r.assigneeUid === TR.uid : !!r.assignee && (TR.myName ? asgNorm(r.assignee) === asgNorm(TR.myName) : !TR.uid && asgNorm(r.assignee) === "me"));
+const isMeWord = n => ["me", "you"].includes(asgNorm(n)) || (!!TR.myName && asgNorm(n) === asgNorm(TR.myName));
+// Off claude.ai there is no signed-in tester, so "me" needs a typed name first.
+function needsName(name) {
+  if (TR.uid || TR.myName || !isMeWord(name)) return false;
+  const w = $("tester-wrap"), i = $("tester-name");
+  if (w) w.hidden = false;
+  if (i) i.focus();
+  toast("Enter your name in the Test cycle bar first, so teammates can tell whose paths these are.");
+  return true;
+}
 function assigneePatch(name) {
   const n = String(name || "").trim();
-  const me = !!n && (asgNorm(n) === "me" || asgNorm(n) === "you" || (!!TR.myName && asgNorm(n) === asgNorm(TR.myName)));
+  const me = !!n && isMeWord(n);
   return { assignee: me ? (TR.myName || "Me") : n, assigneeUid: me ? TR.uid : "" };
 }
 function renderAssignBar() {
@@ -3290,6 +3310,7 @@ function renderAssignBar() {
 }
 async function assignUnassigned(name) {
   if (!state.current) return;
+  if (needsName(name)) return;
   const patch = assigneePatch(name);
   if (!patch.assignee) return toast("Type a tester's name first.");
   const f = state.current.flow, an = state.an, g = genPaths(f, an);
@@ -3366,6 +3387,14 @@ function stepSig(f, an, id) {
   const outs = (an.out.get(id) || []).map(i => (f.edges[i].label || "") + ">" + f.edges[i].to).sort().join(",");
   return hash(a.type + "|" + (a.caption || "") + "|" + a.props.map(p => p.k + "=" + p.v).sort().join(";") + "|" + outs);
 }
+const TESTER_KEY = "cxwb.tester.v1";
+function loadTesterName() { try { return String(localStorage.getItem(TESTER_KEY) || "").trim(); } catch (e) { return ""; } }
+$("tester-name").addEventListener("change", e => {
+  TR.myName = e.target.value.trim(); e.target.value = TR.myName;
+  try { if (TR.myName) localStorage.setItem(TESTER_KEY, TR.myName); else localStorage.removeItem(TESTER_KEY); } catch (err) {}
+  if (TR.myName) toast(`Results you record will show ${TR.myName}.`);
+  if (!$("v-test").hidden) renderTests();
+});
 function localLoad() { try { const d = JSON.parse(localStorage.getItem(TR_LOCAL) || "{}"); return { cycles: d.cycles || [], results: d.results || {} }; } catch (e) { return { cycles: [], results: {} }; } }
 function localSave(d) { try { localStorage.setItem(TR_LOCAL, JSON.stringify(d)); } catch (e) { toast("Browser storage is full, so this result wasn't kept."); } }
 
@@ -3376,6 +3405,8 @@ async function initTests() {
     try { TR.canWrite = TR.user.can ? TR.user.can("data.write") : null; } catch (e) {}
     try { if (TR.uid && TR.user.profiles) { const ps = await TR.user.profiles([TR.uid]); TR.myName = (ps && ps[TR.uid] && ps[TR.uid].name) || ""; } } catch (e) {}
   }
+  if (!TR.uid) { TR.myName = loadTesterName(); $("tester-name").value = TR.myName; }
+  $("tester-wrap").hidden = !!TR.uid;
   if (TR.db) {
     TR.db.collection("testcycles").orderBy("createdAt", "desc").onSnapshot(snap => {
       TR.cycles = snap.docs.map(d => ({ ...d.data(), id: d.id })); TR.loaded = true; trRefresh();
@@ -3463,7 +3494,8 @@ async function saveResult(f, an, p, patch, opts) {
   else {
     rec.tester = TR.uid; rec.testedAt = Date.now(); rec.sigs = sigs;
     delete rec.carried;
-    if (!("testerText" in patch)) delete rec.testerText;
+    // Off claude.ai there's no signed-in id, so the typed name records who tested it.
+    if (!("testerText" in patch)) { if (!TR.uid && TR.myName) rec.testerText = TR.myName; else delete rec.testerText; }
     if (patch.steps && !patch.status) Object.assign(rec, statusFromSteps(p, rec.steps));
   }
   await saveResultDoc(rec);
@@ -3484,7 +3516,7 @@ function renderCycleBar(g) {
   pick.value = TR.cycleId || "";
   pick.disabled = !list.length;
   const c = currentCycle();
-  const where = TR.db ? "Shared with everyone who can open this page." : "Saved in this browser only, because shared storage isn't available here.";
+  const where = TR.db ? "Shared with everyone who can open this page." : "Saved in this browser only, because shared storage isn't available here. To combine a team's results, pass the Excel sheet around and upload it back.";
   $("cycle-note").textContent = c
     ? `${c.name} (${c.env}), started ${new Date(c.createdAt).toLocaleDateString()}${c.fromName ? `, carried over from ${c.fromName}` : ""}. ${where}`
     : `Start a test cycle to record results for each path. ${where}`;
@@ -3621,6 +3653,7 @@ function resultForm(f, an, p, i, list) {
   const notes = el("textarea", { placeholder: "What actually happened: prompts heard, where the call went, any error." }); notes.value = r.notes || "";
   const asgIn = el("input", { type: "text", value: r.assignee || "", placeholder: "Tester name", list: "asg-names", "aria-label": "Assigned to" });
   const saveAsg = async name => {
+    if (needsName(name)) { asgIn.value = r.assignee || ""; return; }
     try {
       const rec = await saveResult(f, an, p, assigneePatch(name), { assignOnly: true });
       asgIn.value = rec.assignee || "";
